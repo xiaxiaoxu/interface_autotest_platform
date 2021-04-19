@@ -70,7 +70,7 @@ function ischecked()
                   <th>断言key</th>
                   <th>维护人</th>
                   <th>提取变量表达式</th>
-                  <th>是否执行</th>
+                  <th>请求方式</th>
                   <th>创建时间</th>
                  {# <th>更新时间</th>#}
                   {#<th>创建用例用户名</th>#}
@@ -88,7 +88,7 @@ function ischecked()
         <td>{{ testcase.assert_key }}</td>
         <td>{{ testcase.maintainer }}</td>
         <td>{{ testcase.extract_var }}</td>
-        <td>{{ testcase.if_execute }}</td>
+        <td>{{ testcase.request_method }}</td>
 		{# <td>{{ testcase.created_time|date:"Y-n-d H:i" }}</td>#}
 		{#<td>{{ testcase.updated_time|date:"Y-n-d H:i" }}</td>#}
 		<td>{{ testcase.user.username }}</td>

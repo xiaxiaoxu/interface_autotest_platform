@@ -7,6 +7,7 @@ from django.contrib import  auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .forms import UserForm
+from . import tasks
 
 # Create your views here.
 
@@ -95,9 +96,13 @@ def testcase(request):
     elif request.method=="POST":
         testcases_list = request.POST.getlist('testcases_list')
         if testcases_list:
+            print("testcases_list: {}".format(testcases_list))
             for testcase in testcases_list:
                 test_case = models.TestCase.objects.filter(id=int(testcase))
-                test_case_execute_record=models.TestCaseExecuteRecord.objects.create(test_case=test_case[0],status=0)
+                print("test_case: {}".format(test_case))
+                print("test_case[0]: {}".format(test_case[0]))
+                # test_case_execute_record=models.TestCaseExecuteRecord.objects.create(test_case=test_case[0],status=0)
+                tasks.interface_test_task(test_case[0])
                 # task_id=tasks.web_test_task.apply_async((test_case_execute_record.id,test_case[0]),countdown=0)
         else:
             print("运行测试用例失败")

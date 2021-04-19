@@ -51,7 +51,7 @@ class TestCase(models.Model):
     assert_key = models.CharField('断言内容', max_length=1024, null=True)
     maintainer = models.CharField('编写人员', max_length=1024, null=False)
     extract_var = models.CharField('提取变量表达式', max_length=1024, null=True)  # userid||userid": (\d+)
-    if_execute = models.CharField('是否执行', max_length=1024, null=False)
+    request_method  = models.CharField('请求方式', max_length=1024, null=True)
     status = models.IntegerField(null=True, help_text="0：表示有效，1：表示无效，用于软删除")
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     updated_time = models.DateTimeField('更新时间', auto_now=True, null=True)
