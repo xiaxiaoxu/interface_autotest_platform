@@ -91,7 +91,7 @@ def module(request):
 def testcase(request):
     testcases=""
     if request.method == "GET":
-        testcases = models.TestCase.objects.filter().order_by('-id')
+        testcases = models.TestCase.objects.filter().order_by('id')
         print("testcases in testcase: {}".format(testcases))
     elif request.method=="POST":
         testcases_list = request.POST.getlist('testcases_list')
@@ -101,9 +101,10 @@ def testcase(request):
                 test_case = models.TestCase.objects.filter(id=int(testcase))
                 print("test_case: {}".format(test_case))
                 print("test_case[0]: {}".format(test_case[0]))
-                # test_case_execute_record=models.TestCaseExecuteRecord.objects.create(test_case=test_case[0],status=0)
+                test_case_execute_record=models.TestCaseExecuteRecord.objects.create(test_case=test_case[0],status=0)
                 tasks.interface_test_task(test_case[0])
                 # task_id=tasks.web_test_task.apply_async((test_case_execute_record.id,test_case[0]),countdown=0)
+                task_id=tasks.interface_test_task((test_case_execute_record.id, test_case[0]))
         else:
             print("运行测试用例失败")
             return HttpResponse("提交的运行测试用例为空，请选择用例后在提交！")

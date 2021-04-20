@@ -1,21 +1,15 @@
 ﻿from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from . import models
-from .utils import api_request
+from . utils.api_request import api_request
+from .utils.dataHandler import data_handler
 import os
-
+import json
 import traceback
 import time
 
 ip = "39.100.104.214"
 port = "8000"
-
-
-
-
-@shared_task
-def mul(x, y):
-    return x * y
 
 
 @shared_task
@@ -111,10 +105,10 @@ def web_test_task(execute_id, testcase_id):
     execute_record.save()
 
 
-def interface_test_task(test_case):
-    # execute_record = models.TestCaseExecuteRecord.objects.get(id=execute_id)
-    # execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
-    # execute_record.save()
+def interface_test_task(execute_id, test_case):
+    execute_record = models.TestCaseExecuteRecord.objects.get(id=execute_id)
+    execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    execute_record.save()
     '''
     interface_name = models.CharField('接口名称', max_length=50, null=False)  # register
     belong_project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='所属项目')
@@ -146,6 +140,25 @@ def interface_test_task(test_case):
     print("belong_module: {}".format(belong_module))
     print("maintainer: {}".format(maintainer))
     print("request_method: {}".format(request_method))
-    url = "http://{}:{}/register".format(ip, port)
+    url = "http://{}:{}/{}".format(ip, port, interface_name)
     print("url: {}".format(url))
-    api_request(url, str(request_method), str(request_data))
+    request_data = data_handler(str(request_data))
+    print("request_data: {}".format(request_data))
+    res_data = api_request(url, request_method, json.loads(request_data))
+    print("res_data.json(): {}".format(res_data.json()))
+    if res_data.json().get("code", "") == "00":
+        print("用例执行成功")
+        execute_record.result = "成功"
+        execute_record.status = 1
+        execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
+        execute_record.save()
+    else:
+        print("用例执行失败")
+        execute_record.result = "失败"
+        execute_record.status = 1
+        execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
+        execute_record.save()
+
+

@@ -72,7 +72,7 @@ class TestCaseAdmin(admin.ModelAdmin):
 class TestCaseExecuteRecord(models.Model):
     id = models.AutoField(primary_key=True)
     belong_test_case = GroupedForeignKey(TestCase, "belong_test_case", on_delete=models.CASCADE, verbose_name='所属用例')
-    response_data = models.CharField('执行结果', max_length=1024, null=False)  # {"code": "00", "userid": 22889}
+    response_data = models.CharField('响应字符串', max_length=1024, null=False)  # {"code": "00", "userid": 22889}
     execute_result = models.CharField('执行结果', max_length=1024, null=False)  # 成功/失败
     execute_total_time = models.CharField('执行耗时', max_length=1024, null=False)  # 35秒
     execute_start_time = models.CharField('执行开始时间', max_length=300, blank=True, null=True)
