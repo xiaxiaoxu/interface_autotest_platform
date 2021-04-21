@@ -41,15 +41,32 @@ class Module(models.Model):
         verbose_name = '模块信息表'
         verbose_name_plural = '模块信息表'
 
+class Configuration(models.Model):
+    id = models.AutoField(primary_key=True)
+    env = models.CharField('环境', max_length=50, null=False, default='')
+    ip = models.CharField('ip', max_length=50, null=False, default='')
+    port = models.CharField('端口', max_length=100, null=False, default='')
+    remark = models.CharField('备注', max_length=100, null=True)
+    create_time = models.DateTimeField('创建时间', auto_now_add=True)
+    update_time = models.DateTimeField('更新时间', auto_now=True, null=True)
+
+    def __str__(self):
+        return self.env
+
+    class Meta:
+        verbose_name = '接口地址配置表'
+        verbose_name_plural = '接口地址配置表'
+
 
 class TestCase(models.Model):
     id = models.AutoField(primary_key=True)
-    interface_name = models.CharField('接口名称', max_length=50, null=False)  # register
+    case_name = models.CharField('用例名称', max_length=50, null=False)  # register
     belong_project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='所属项目')
     belong_module = GroupedForeignKey(Module, "belong_project", on_delete=models.CASCADE, verbose_name='所属模块')
-    request_data = models.CharField('请求数据', max_length=1024, null=False)
+    request_data = models.CharField('请求数据', max_length=1024, null=False, default='')
+    uri = models.CharField('接口地址', max_length=1024, null=False, default='')
     assert_key = models.CharField('断言内容', max_length=1024, null=True)
-    maintainer = models.CharField('编写人员', max_length=1024, null=False)
+    maintainer = models.CharField('编写人员', max_length=1024, null=False, default='')
     extract_var = models.CharField('提取变量表达式', max_length=1024, null=True)  # userid||userid": (\d+)
     request_method  = models.CharField('请求方式', max_length=1024, null=True)
     status = models.IntegerField(null=True, help_text="0：表示有效，1：表示无效，用于软删除")
@@ -58,7 +75,7 @@ class TestCase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='所属用户', null=True)
 
     def __str__(self):
-        return self.interface_name
+        return self.case_name
 
     class Meta:
         verbose_name = '测试用例表'
@@ -66,7 +83,7 @@ class TestCase(models.Model):
 
 
 class TestCaseAdmin(admin.ModelAdmin):
-    list_display = ("id", "interface_name", "belong_project", "belong_module", "maintainer", "user", "created_time", "updated_time")
+    list_display = ("id", "case_name", "belong_project", "belong_module", "maintainer", "user", "created_time", "updated_time")
 
 
 class TestCaseExecuteRecord(models.Model):
@@ -160,6 +177,9 @@ class TestCaseInline(admin.TabularInline):
 class ModuleAdmin(admin.ModelAdmin):
     inlines = [TestCaseInline]  # Inline  
     list_display = ("id", "name", "belong_project", "test_owner", "desc", "create_time", "update_time")
+
+class ConfigurationAdmin(admin.ModelAdmin):
+    list_display = ("id", "env", "ip", "port", "remark", "create_time")
 
 
 # class CaseStepInline(admin.TabularInline):

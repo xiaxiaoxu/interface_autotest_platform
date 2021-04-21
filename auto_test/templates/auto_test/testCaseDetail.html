@@ -14,6 +14,7 @@
                   <th>接口名称</th>
                   <th>所属项目</th>
                   <th>所属模块</th>
+                  <th>接口地址</th>
                   <th>请求数据</th>
                   <th>断言内容</th>
                   <th>编写人员</th>
@@ -24,9 +25,10 @@
                 <tbody>
         	<tr>
                 <td>{{ testcase.id }}</td>
-                <td>{{ testcase.interface_name }}</td>
+                <td>{{ testcase.case_name }}</td>
                 <td>{{ testcase.belong_project }}</td>
                 <td>{{ testcase.belong_module }}</td>
+                <td>{{ testcase.uri }}</td>
                 <td>{{ testcase.request_data }}</td>
                 <td>{{ testcase.assert_key }}</td>
                 <td>{{ testcase.maintainer }}</td>

@@ -79,7 +79,7 @@ function ischecked()
         	<tr>
 		<td><input type="checkbox" value="{{ testcase.test_case.id }}" name="testcases_list" ></td>
         <td>{{ testcase.test_case.id }}</td>
-        <td><a href = "{% url 'testCaseDetail' testcase.test_case.id%}">{{ testcase.test_case.interface_name }}</a></td>
+        <td><a href = "{% url 'testCaseDetail' testcase.test_case.id%}">{{ testcase.test_case.case_name }}</a></td>
 		<td>{{ testcase.test_case.belong_project.name }}</td>
 		<td>{{ testcase.test_case.belong_module.name }}</td>
 		<td>{{ testcase.test_case.maintainer }}</td>

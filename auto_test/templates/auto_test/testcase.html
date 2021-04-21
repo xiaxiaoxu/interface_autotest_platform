@@ -58,6 +58,11 @@ function ischecked()
 <form action="" method="POST">
 {% csrf_token %}
 <input type="submit" id="all_check1" value='运行后台测试用例' onclick="return ischecked()"/>
+<span style="margin-left: 5px;">运行环境：</span>
+<select name="env">
+    <option selected value="dev">dev</option>
+    <option value="prod">prod</option>
+</select>
     <div class="table-responsive">
             <table class="table table-striped">
               <thead>        
@@ -66,13 +71,14 @@ function ischecked()
                   <th>用例名称</th>
                   <th>所属项目</th>
                   <th>所属模块</th>
+                  <th>接口地址</th>
                   <th>请求数据</th>
                   <th>断言key</th>
                   <th>维护人</th>
                   <th>提取变量表达式</th>
                   <th>请求方式</th>
-                  <th>创建时间</th>
-                 {# <th>更新时间</th>#}
+                  {# <th>创建时间</th>#}
+                  {# <th>更新时间</th>#}
                   {#<th>创建用例用户名</th>#}
                 </tr>
                 </thead>
@@ -81,9 +87,10 @@ function ischecked()
  	{% for testcase in testcases %}
         	<tr>
 		<td><input type="checkbox" value="{{ testcase.id }}" name="testcases_list" > {{ testcase.id }}</td>
-		<td><a href = "{% url 'testCaseDetail' testcase.id%}">{{ testcase.interface_name }}</a></td>
+		<td><a href = "{% url 'testCaseDetail' testcase.id%}">{{ testcase.case_name }}</a></td>
 		<td>{{ testcase.belong_project.name }}</td>
 		<td>{{ testcase.belong_module.name }}</td>
+        <td>{{ testcase.uri }}</td>
         <td>{{ testcase.request_data }}</td>
         <td>{{ testcase.assert_key }}</td>
         <td>{{ testcase.maintainer }}</td>
@@ -98,9 +105,9 @@ function ischecked()
              
              </tbody>
             </table>
-<form>
-    </div>
 
+    </div>
+</form>
     {# 实现分页标签的代码 #}
     {# 这里使用 bootstrap 渲染页面 #}
     <div id="pages" class="text-center" >
