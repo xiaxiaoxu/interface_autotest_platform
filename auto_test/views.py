@@ -86,6 +86,21 @@ def module(request):
         modules = models.Module.objects.filter(belong_project__in=projs)  # 把项目中所有的模块都找出来
     return render(request, 'auto_test/module.html', {'modules': get_paginator(request, modules)})
 
+def get_server_address(env):
+    if env:  # 环境处理
+        env_data = models.Configuration.objects.filter(env=env[0])
+        print("env_data: {}".format(env_data))
+        if env_data:
+            ip = env_data[0].ip
+            port = env_data[0].port
+            print("ip: {}, port: {}".format(ip, port))
+            server_address = "http://{}:{}".format(ip, port)
+            print("server_address: {}".format(server_address))
+            return server_address
+        else:
+            return ""
+    else:
+        return ""
 
 @login_required
 def testcase(request):
@@ -96,16 +111,22 @@ def testcase(request):
     elif request.method=="POST":
         print("request.POST: {}".format(request.POST))
         testcases_list = request.POST.getlist('testcases_list')
+        env = request.POST.getlist('env')
+        print("env: {}".format(env))
+
+        server_address = get_server_address(env)
+        if not server_address:
+            return HttpResponse("提交的运行环境为空，请选择环境后再提交！")
+
         if testcases_list:
             print("testcases_list: {}".format(testcases_list))
             for testcase in testcases_list:
                 test_case = models.TestCase.objects.filter(id=int(testcase))
                 print("test_case: {}".format(test_case))
                 print("test_case[0]: {}".format(test_case[0]))
-                test_case_execute_record=models.TestCaseExecuteRecord.objects.create(test_case=test_case[0],status=0)
-                tasks.interface_test_task(test_case_execute_record.id, test_case[0])
+                test_case_execute_record=models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case[0])
+                tasks.interface_test_task(test_case_execute_record.id, test_case[0], server_address)
                 # task_id=tasks.web_test_task.apply_async((test_case_execute_record.id,test_case[0]),countdown=0)
-                task_id=tasks.interface_test_task(test_case_execute_record.id, test_case[0])
         else:
             print("运行测试用例失败")
             return HttpResponse("提交的运行测试用例为空，请选择用例后在提交！")

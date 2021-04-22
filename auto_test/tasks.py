@@ -105,7 +105,7 @@ def web_test_task(execute_id, testcase_id):
     execute_record.save()
 
 
-def interface_test_task(execute_id, test_case):
+def interface_test_task(execute_id, test_case, server_address):
     execute_record = models.TestCaseExecuteRecord.objects.get(id=execute_id)
     execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
     execute_record.save()
@@ -127,7 +127,7 @@ def interface_test_task(execute_id, test_case):
     request_data = test_case.request_data
     extract_var = test_case.extract_var
     assert_key = test_case.assert_key
-    interface_name = test_case.interface_name
+    interface_name = test_case.uri
     belong_project = test_case.belong_project
     belong_module = test_case.belong_module
     maintainer = test_case.maintainer
@@ -140,7 +140,7 @@ def interface_test_task(execute_id, test_case):
     print("belong_module: {}".format(belong_module))
     print("maintainer: {}".format(maintainer))
     print("request_method: {}".format(request_method))
-    url = "http://{}:{}/{}".format(ip, port, interface_name)
+    url = "{}/{}".format(server_address, interface_name)
     print("url: {}".format(url))
     request_data = data_handler(str(request_data))
     print("request_data: {}".format(request_data))
