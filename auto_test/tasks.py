@@ -144,21 +144,30 @@ def interface_test_task(execute_id, test_case, server_address):
     print("url: {}".format(url))
     request_data = data_handler(str(request_data))
     print("request_data: {}".format(request_data))
-    res_data = api_request(url, request_method, json.loads(request_data))
-    print("res_data.json(): {}".format(res_data.json()))
-    if res_data.json().get("code", "") == "00":
-        print("用例执行成功")
-        execute_record.result = "成功"
-        execute_record.status = 1
-        execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
+    try:
+        res_data = api_request(url, request_method, json.loads(request_data))
+        print("res_data.json(): {}".format(res_data.json()))
+        if res_data.json().get("code", "") == "00":
+            print("用例执行成功")
+            execute_record.execute_result = "成功"
+            execute_record.response_data = res_data.text
+            execute_record.status = 1
+            execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
+            # execute_record.execute_total_time = execute_record.execute_end_time - execute_record.execute_start_time
+            execute_record.save()
+        else:
+            print("用例执行失败")
+            execute_record.execute_result = "失败"
+            execute_record.response_data = res_data.text
+            execute_record.status = 1
+            execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
+            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
+            execute_record.save()
+    except Exception as e:
+        print("接口请求异常，error: {}".format(e))
+        execute_record.exception_info = e
         execute_record.save()
-    else:
-        print("用例执行失败")
-        execute_record.result = "失败"
-        execute_record.status = 1
-        execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
-        execute_record.save()
+
 
 
