@@ -197,11 +197,14 @@ def testsuit(request):
             print("------********", testsuits)
             for testsuit in testsuits:
                 test_suit = models.TestSuit.objects.get(id=int(testsuit))
+                print("test_suit: {}".format(test_suit))
                 username = request.user.username
                 test_suit_record = models.TestSuitExecuteRecord.objects.create(test_suit=test_suit,
                                                                                run_time_interval=count_down_time,
                                                                                creator=username)
-                # task_id = tasks.web_suit_task.apply_async((test_suit_record.id, int(testsuit)),
+
+                tasks.web_suit_task(test_suit_record.id, int(testsuit))
+                # task_id = tasks.web_suit_task.apply_async((test_suit_record.id, int(testsuit ),
                 #                                           countdown=count_down_time)
                 # web_suit_task
         else:

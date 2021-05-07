@@ -170,4 +170,19 @@ def interface_test_task(execute_id, test_case, server_address):
         execute_record.save()
 
 
+def web_suit_task(execute_id, testsuit_id):
+    test_suit = models.TestSuit.objects.get(id=testsuit_id)
+    test_suit_test_cases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)
+    test_suit_record = models.TestSuitExecuteRecord.objects.get(id=execute_id)
+    test_suit_record.test_result = "成功"
+    test_suit_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    for test_suit_test_case in test_suit_test_cases:
+        test_case = test_suit_test_case.test_case
+        # test_case_record = models.TestSuitTestCaseExecuteRecord.objects.create(test_suit_record=test_suit_record,
+        #                                                                        test_case=test_case)
+
+        server_address = "http://39.100.104.214:8000"
+        interface_test_task(execute_id, test_case, server_address)
+    test_suit_record.status = 1
+    test_suit_record.save()
 
