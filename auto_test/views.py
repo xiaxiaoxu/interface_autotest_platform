@@ -225,6 +225,11 @@ def show_test_suit_record(request):
     return render(request, 'auto_test/testsuitrecord.html', {'test_suit_records': get_paginator(request,test_suit_records)})
 
 @login_required
+def show_exception(request,execute_id):
+    testrecord = models.TestCaseExecuteRecord.objects.get(id=execute_id)
+    return render(request, 'auto_test/exceptioninfo.html', {'exception_info': testrecord.exception_info })
+
+@login_required
 def show_testsuit_cases(request,suit_id):
     test_suit = models.TestSuit.objects.get(id=suit_id)
     testcases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)

@@ -17,20 +17,22 @@ from django.contrib import admin
 from django.conf.urls import url
 from auto_test import views
 
-
 urlpatterns = [
     url('admin/', admin.site.urls),
     url('^index/$', views.index),
     url('^project/$', views.project, name="project"),
-    url(r"^module/$",views.module,name="module"),
-    url(r"^testcase/$",views.testcase,name="testcase"),
-    url(r"^moduleTestCases/(?P<module_id>[0-9]+)/$",views.module_testcases,name="moduleCases"),
-    url(r"^testCaseDetail/(?P<testcase_id>[0-9]+)$",views.test_case_detail,name="testCaseDetail"),
-    url(r'^testsuit/',views.testsuit,name="testsuit"),
-    url(r'^suitcases/(?P<suit_id>[0-9]+)$',views.show_testsuit_cases,name="suitcases"),
-    url(r"^testrecord/$",views.testrecord,name="testrecord"),
-    url(r'^testsuitrecord/$',views.show_test_suit_record,name="showsuitrecord"),
-    url(r'^managesuit/(?P<suit_id>[0-9]+)$',views.managesuit,name="managesuit"),
+    url(r"^module/$", views.module, name="module"),
+    url(r"^testcase/$", views.testcase, name="testcase"),
+    url(r"^testrecord/$", views.testrecord, name="testrecord"),
+    url(r"^moduleTestCases/(?P<module_id>[0-9]+)/$", views.module_testcases, name="moduleCases"),
+    url(r"^testCaseDetail/(?P<testcase_id>[0-9]+)$", views.test_case_detail, name="testCaseDetail"),
+    url(r'^testsuit/', views.testsuit, name="testsuit"),
+    url(r'^suitcases/(?P<suit_id>[0-9]+)$', views.show_testsuit_cases, name="suitcases"),
+    url(r'^testsuitrecord/$', views.show_test_suit_record, name="showsuitrecord"),
+    url(r"^testrecord/$", views.testrecord, name="testrecord"),
+    url(r'^testsuitrecord/$', views.show_test_suit_record, name="showsuitrecord"),
+    url(r'^managesuit/(?P<suit_id>[0-9]+)$', views.managesuit, name="managesuit"),
+    url(r"^exceptioninfo/(?P<execute_id>[0-9]+)$", views.show_exception, name="showexception"),
     url('^login/$', views.login),
     url('^logout/$', views.logout),
     url('^accounts', views.login)

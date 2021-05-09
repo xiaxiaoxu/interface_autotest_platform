@@ -1,12 +1,13 @@
 ﻿from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from . import models
-from . utils.api_request import api_request
+from .utils.api_request import api_request
 from .utils.dataHandler import data_handler
 import os
 import json
 import traceback
 import time
+from dateutil.parser import parse
 
 ip = "39.100.104.214"
 port = "8000"
@@ -100,14 +101,17 @@ def web_test_task(execute_id, testcase_id):
 
     print("done!!!!")
     execute_record.status = 1
-    execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S:%M")
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
     execute_record.save()
 
 
 def interface_test_task(execute_id, test_case, server_address):
     execute_record = models.TestCaseExecuteRecord.objects.get(id=execute_id)
-    execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
+    print("execute_start_time: {}".format(execute_start_time))
+    execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_start_time))
+    print("execute_record.execute_start_time: {}".format(execute_record.execute_start_time))
     execute_record.save()
     '''
     interface_name = models.CharField('接口名称', max_length=50, null=False)  # register
@@ -152,17 +156,24 @@ def interface_test_task(execute_id, test_case, server_address):
             execute_record.execute_result = "成功"
             execute_record.response_data = res_data.text
             execute_record.status = 1
-            execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
-            # execute_record.execute_total_time = execute_record.execute_end_time - execute_record.execute_start_time
+            execute_end_time = time.time()
+            print("execute_end_time: {}".format(execute_end_time))
+            execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_end_time))
+            print("execute_record.execute_end_time: {}".format(execute_record.execute_end_time))
+            print("int((execute_end_time - execute_start_time) * 1000): {}".format(int((execute_end_time - execute_start_time) * 1000)))
+            execute_record.execute_total_time = int((execute_end_time - execute_start_time) * 1000)
+            print("execute_record.execute_total_time.microseconds: {}".format(execute_record.execute_total_time))
             execute_record.save()
         else:
             print("用例执行失败")
             execute_record.execute_result = "失败"
             execute_record.response_data = res_data.text
             execute_record.status = 1
-            execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
+            execute_end_time = time.time()
+            execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_end_time))
+            print("execute_record.execute_end_time: {}".format(execute_record.execute_end_time))
+            execute_record.execute_total_time = int(execute_end_time - execute_start_time) * 1000
+            print("execute_record.execute_total_time: {}".format(execute_record.execute_total_time))
             execute_record.save()
     except Exception as e:
         print("接口请求异常，error: {}".format(e))
@@ -185,4 +196,3 @@ def web_suit_task(execute_id, testsuit_id):
         interface_test_task(execute_id, test_case, server_address)
     test_suit_record.status = 1
     test_suit_record.save()
-

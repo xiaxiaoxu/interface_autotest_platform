@@ -26,7 +26,7 @@
  	{% for test_suit_record in test_suit_records %}
         	<tr>
 		<td>{{ test_suit_record.id }}</td>
-		<td><a href="{% url 'showsuitcaserecord' test_suit_record.id %}">{{ test_suit_record.test_suit.name }}</a></td>
+		<td><a href="">{{ test_suit_record.test_suit.name }}</a></td>
                 <td>{{ test_suit_record.run_time_interval }}</a></td>
                 {% if test_suit_record.status %}
 		<td>执行完毕</td>
