@@ -106,8 +106,7 @@ def web_test_task(execute_id, testcase_id):
     execute_record.save()
 
 
-def interface_test_task(execute_id, test_case, server_address):
-    execute_record = models.TestCaseExecuteRecord.objects.get(id=execute_id)
+def interface_test_task(execute_record, test_case, server_address):
     execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
     print("execute_start_time: {}".format(execute_start_time))
     execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_start_time))
@@ -148,6 +147,7 @@ def interface_test_task(execute_id, test_case, server_address):
     print("url: {}".format(url))
     request_data = data_handler(str(request_data))
     print("request_data: {}".format(request_data))
+    execute_record.request_data = request_data
     try:
         res_data = api_request(url, request_method, json.loads(request_data))
         print("res_data.json(): {}".format(res_data.json()))
@@ -164,6 +164,7 @@ def interface_test_task(execute_id, test_case, server_address):
             execute_record.execute_total_time = int((execute_end_time - execute_start_time) * 1000)
             print("execute_record.execute_total_time.microseconds: {}".format(execute_record.execute_total_time))
             execute_record.save()
+            return True # 成功返回，用于test_suite判断结果
         else:
             print("用例执行失败")
             execute_record.execute_result = "失败"
@@ -175,16 +176,15 @@ def interface_test_task(execute_id, test_case, server_address):
             execute_record.execute_total_time = int(execute_end_time - execute_start_time) * 1000
             print("execute_record.execute_total_time: {}".format(execute_record.execute_total_time))
             execute_record.save()
+            return False  # 成功返回1，用于test_suite判断结果
     except Exception as e:
         print("接口请求异常，error: {}".format(e))
         execute_record.exception_info = e
         execute_record.save()
 
 
-def web_suit_task(execute_id, testsuit_id):
-    test_suit = models.TestSuit.objects.get(id=testsuit_id)
+def web_suit_task(test_suit_record, test_suit):
     test_suit_test_cases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)
-    test_suit_record = models.TestSuitExecuteRecord.objects.get(id=execute_id)
     test_suit_record.test_result = "成功"
     test_suit_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
     for test_suit_test_case in test_suit_test_cases:
@@ -193,6 +193,9 @@ def web_suit_task(execute_id, testsuit_id):
         #                                                                        test_case=test_case)
 
         server_address = "http://39.100.104.214:8000"
-        interface_test_task(execute_id, test_case, server_address)
+        test_case_execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case)
+        case_execute_result = interface_test_task(test_case_execute_record, test_case, server_address)
+        if not case_execute_result :
+            test_suit_record.test_result = "失败"
     test_suit_record.status = 1
     test_suit_record.save()

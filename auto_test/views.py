@@ -3,11 +3,12 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
 from . import models
 import traceback
-from django.contrib import  auth
+from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .forms import UserForm
 from . import tasks
+
 
 # Create your views here.
 
@@ -33,13 +34,14 @@ def get_paginator(request, data):
     print("----------------", paginator_pages)
     return paginator_pages
 
+
 def index(request):
     pass
     return render(request, 'auto_test/index.html')
 
 
 def login(request):
-    if request.session.get('is_login',None):
+    if request.session.get('is_login', None):
         return redirect('/project')
 
     if request.method == "POST":
@@ -51,9 +53,9 @@ def login(request):
             try:
                 user = auth.authenticate(username=username, password=password)
                 if user is not None:
-                    print("**********"*10,)
-                    auth.login( request,user)
-                    request.session['is_login']=True
+                    print("**********" * 10, )
+                    auth.login(request, user)
+                    request.session['is_login'] = True
                     return redirect('/project/')
                 else:
                     message = "用户名不能存在或者密码不正确！"
@@ -66,12 +68,13 @@ def login(request):
     login_form = UserForm()
     return render(request, 'auto_test/login.html', locals())
 
+
 @login_required
 def project(request):
-    print("login success!",request.user.is_authenticated)
+    print("login success!", request.user.is_authenticated)
     projects = models.Project.objects.filter().order_by('-id')
-    print("projects:",projects)
-    return render(request, 'auto_test/project.html', {'projects': get_paginator(request,projects) })
+    print("projects:", projects)
+    return render(request, 'auto_test/project.html', {'projects': get_paginator(request, projects)})
 
 
 @login_required
@@ -85,6 +88,7 @@ def module(request):
         projs = [proj.id for proj in projs]
         modules = models.Module.objects.filter(belong_project__in=projs)  # 把项目中所有的模块都找出来
     return render(request, 'auto_test/module.html', {'modules': get_paginator(request, modules)})
+
 
 def get_server_address(env):
     if env:  # 环境处理
@@ -102,13 +106,14 @@ def get_server_address(env):
     else:
         return ""
 
+
 @login_required
 def testcase(request):
-    testcases=""
+    testcases = ""
     if request.method == "GET":
         testcases = models.TestCase.objects.filter().order_by('id')
         print("testcases in testcase: {}".format(testcases))
-    elif request.method=="POST":
+    elif request.method == "POST":
         print("request.POST: {}".format(request.POST))
         testcases_list = request.POST.getlist('testcases_list')
         env = request.POST.getlist('env')
@@ -124,51 +129,51 @@ def testcase(request):
                 test_case = models.TestCase.objects.filter(id=int(testcase))
                 print("test_case: {}".format(test_case))
                 print("test_case[0]: {}".format(test_case[0]))
-                test_case_execute_record=models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case[0])
-                tasks.interface_test_task(test_case_execute_record.id, test_case[0], server_address)
+                test_case_execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case[0])
+                tasks.interface_test_task(test_case_execute_record, test_case[0], server_address)
                 # task_id=tasks.web_test_task.apply_async((test_case_execute_record.id,test_case[0]),countdown=0)
         else:
             print("运行测试用例失败")
             return HttpResponse("提交的运行测试用例为空，请选择用例后在提交！")
         testcases = models.TestCase.objects.filter().order_by('-id')
-    return render(request, 'auto_test/testcase.html', {'testcases': get_paginator(request,testcases) })
+    return render(request, 'auto_test/testcase.html', {'testcases': get_paginator(request, testcases)})
 
 
 @login_required
-def module_testcases(request,module_id):
-    testcases=""
-    module=""
-    if module_id:#访问的时候，会从url中提取模块的id，根据模块id查询到模块数据，在模板中展现
+def module_testcases(request, module_id):
+    testcases = ""
+    module = ""
+    if module_id:  # 访问的时候，会从url中提取模块的id，根据模块id查询到模块数据，在模板中展现
         module = models.Module.objects.get(id=int(module_id))
-    if request.method=="POST":#如果是post方法，收到所有的测试用例id，提交给测试用例执行表
+    if request.method == "POST":  # 如果是post方法，收到所有的测试用例id，提交给测试用例执行表
         testcases_list = request.POST.getlist('testcases_list')
         if testcases_list:
             for testcase in testcases_list:
                 test_case = models.TestCase.objects.get(id=int(testcase))
-                #把选中的用例添加到测试用例执行表中，用celery去执行
-                execute_record=models.TestCaseExecuteRecord.objects.create(test_case=test_case,status=0)
+                # 把选中的用例添加到测试用例执行表中，用celery去执行
+                execute_record = models.TestCaseExecuteRecord.objects.create(test_case=test_case, status=0)
                 # task_id=tasks.web_test_task.apply_async((execute_record.id,test_case),countdown=0)
         else:
             print("运行测试用例失败")
             return HttpResponse("提交的运行测试用例为空，请选择用例后在提交！")
     testcases = models.TestCase.objects.filter(belong_module=module).order_by('-id')
     print("testcases in module_testcases: {}".format(module_testcases))
-    return render(request, 'auto_test/testcase.html', {'testcases': get_paginator(request,testcases) })
+    return render(request, 'auto_test/testcase.html', {'testcases': get_paginator(request, testcases)})
+
 
 @login_required
-def test_case_detail(request,testcase_id):
-    testcase_id=int(testcase_id)
-    test_case =  models.TestCase.objects.get(id=testcase_id)
+def test_case_detail(request, testcase_id):
+    testcase_id = int(testcase_id)
+    test_case = models.TestCase.objects.get(id=testcase_id)
     print("test_case: {}".format(test_case))
     print("test_case.id: {}".format(test_case.id))
     print("test_case.belong_project: {}".format(test_case.belong_project))
     print("test_case: {}".format(test_case))
-    #print("**********",test_case)
+    # print("**********",test_case)
     # teststeps = models.CaseStep.objects.filter(test_case = test_case).order_by('id')
-    #print("**********",teststeps)
+    # print("**********",teststeps)
 
     return render(request, 'auto_test/testCaseDetail.html', {'testcase': test_case})
-
 
 
 def register(request):
@@ -203,7 +208,7 @@ def testsuit(request):
                                                                                run_time_interval=count_down_time,
                                                                                creator=username)
 
-                tasks.web_suit_task(test_suit_record.id, int(testsuit))
+                tasks.web_suit_task(test_suit_record, testsuit)
                 # task_id = tasks.web_suit_task.apply_async((test_suit_record.id, int(testsuit ),
                 #                                           countdown=count_down_time)
                 # web_suit_task
@@ -217,51 +222,66 @@ def testsuit(request):
 @login_required
 def testrecord(request):
     testrecords = models.TestCaseExecuteRecord.objects.filter().order_by('-id')
-    return render(request, 'auto_test/testrecord.html', {'testrecords': get_paginator(request,testrecords) })
+    return render(request, 'auto_test/testrecord.html', {'testrecords': get_paginator(request, testrecords)})
+
 
 @login_required
 def show_test_suit_record(request):
     test_suit_records = models.TestSuitExecuteRecord.objects.filter().order_by('-id')
-    return render(request, 'auto_test/testsuitrecord.html', {'test_suit_records': get_paginator(request,test_suit_records)})
+    return render(request, 'auto_test/testsuitrecord.html',
+                  {'test_suit_records': get_paginator(request, test_suit_records)})
+
 
 @login_required
-def show_exception(request,execute_id):
+def show_test_suit_test_case_record(request, suit_record_id):
+    test_suit_execute_record = models.TestSuitExecuteRecord.objects.get(id=suit_record_id)
+    test_cases_records = models.TestSuitTestCaseExecuteRecord.objects.filter(test_suit_record=test_suit_execute_record)
+    return render(request, 'auto_test/testsuittestcaserecord.html',
+                  {'test_cases_records': get_paginator(request, test_cases_records)})
+
+
+@login_required
+def show_exception(request, execute_id):
     testrecord = models.TestCaseExecuteRecord.objects.get(id=execute_id)
-    return render(request, 'auto_test/exceptioninfo.html', {'exception_info': testrecord.exception_info })
+    return render(request, 'auto_test/exceptioninfo.html', {'exception_info': testrecord.exception_info})
+
 
 @login_required
-def show_testsuit_cases(request,suit_id):
+def show_testsuit_cases(request, suit_id):
     test_suit = models.TestSuit.objects.get(id=suit_id)
     testcases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)
-    if request.method=="POST":
+    if request.method == "POST":
         testcases_list = request.POST.getlist('testcases_list')
         if testcases_list:
-            print("------********",testcases_list)
+            print("------********", testcases_list)
             for testcase in testcases_list:
                 test_case = models.TestCase.objects.get(id=int(testcase))
-                models.TestSuitTestCases.objects.filter(test_suit=test_suit,test_case=test_case).first().delete()
+                models.TestSuitTestCases.objects.filter(test_suit=test_suit, test_case=test_case).first().delete()
         else:
             print("删除测试集合的测试用例失败")
             return HttpResponse("删除的运行测试用例为空，请选择用例后再进行删除！")
     test_suit = models.TestSuit.objects.get(id=suit_id)
     testcases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)
-    return render(request, 'auto_test/suitcases.html', {'testcases': get_paginator(request,testcases),'test_suit':test_suit})
+    return render(request, 'auto_test/suitcases.html',
+                  {'testcases': get_paginator(request, testcases), 'test_suit': test_suit})
+
 
 @login_required
-def managesuit(request,suit_id):
+def managesuit(request, suit_id):
     test_suit = models.TestSuit.objects.get(id=suit_id)
     if request.method == "GET":
         testcases = models.TestCase.objects.filter().order_by('-id')
-        print("testcases:",testcases)
-    elif request.method=="POST":
+        print("testcases:", testcases)
+    elif request.method == "POST":
         testcases_list = request.POST.getlist('testcases_list')
         if testcases_list:
-            print("------********",testcases_list)
+            print("------********", testcases_list)
             for testcase in testcases_list:
                 test_case = models.TestCase.objects.get(id=int(testcase));
-                suitcase=models.TestSuitTestCases.objects.create(test_suit=test_suit,test_case=test_case)
+                suitcase = models.TestSuitTestCases.objects.create(test_suit=test_suit, test_case=test_case)
         else:
             print("添加测试用例失败")
             return HttpResponse("添加的运行测试用例为空，请选择用例后再添加！")
         testcases = models.TestCase.objects.filter().order_by('-id')
-    return render(request, 'auto_test/managesuit.html', {'testcases': get_paginator(request,testcases),'test_suit':test_suit })
+    return render(request, 'auto_test/managesuit.html',
+                  {'testcases': get_paginator(request, testcases), 'test_suit': test_suit})

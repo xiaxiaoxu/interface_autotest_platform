@@ -29,7 +29,7 @@
         	<tr>
 		<td>{{ testrecord.id }}</td>
 		<td><a href="" target="_blank">{{ testrecord.belong_test_case.case_name }}</a></td>
-        <td>{{ testrecord.belong_test_case.request_data }}</td>
+        <td>{{ testrecord.request_data }}</td>
         <td>{{ testrecord.response_data }}</td>
         <td>{{ testrecord.belong_test_case.assert_key }}</td>
 		<td>{{ testrecord.execute_result|default_if_none:"" }}</td>

@@ -1,0 +1,77 @@
+﻿{% extends 'auto_test/base.html' %}
+{% block title %}主页{% endblock %}
+
+{% block content %}
+    {% if request.session.is_login %}
+    <h1>你好,{{ request.session.user_name }}！欢迎回来！</h1>
+    {% endif %}
+    <br>
+
+
+    <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>执行序号</th>
+                  <th>测试集合名称</th>
+                  <th>测试用例名称</th>
+                  <th>执行状态</th>
+                  <th>执行结果</th>
+                  <th>异常信息</th>
+                  <th>截图信息</th>
+                  <th>执行开始时间</th>
+                  <th>执行结束时间</th>
+                </tr>
+                </thead>
+                <tbody>
+          
+ 	{% for test_cases_record in test_cases_records %}
+        	<tr>
+		<td>{{ test_cases_record.id }}</td>
+		<td>{{ test_cases_record.test_suit_record.test_suit.name }}</a></td>
+                <td><a href="{% url 'testsuitstepresult' test_cases_record.id%}">{{ test_cases_record.test_case.name }}</a></td>
+                {% if test_cases_record.status %}
+                    <td>执行完毕</td>
+                {% else %}
+                <td>待执行</td>
+                {% endif %}
+		<td>{{ test_cases_record.test_result|default_if_none:"" }}</td>
+                {% if test_cases_record.exception_info %}
+                <td><a href="{% url 'showsuitception' test_cases_record.id %}" target="_blank">显示异常信息</a></td>
+                {% else %}
+                <td>无</td>
+                {% endif %}
+                {% if test_cases_record.capture_screen %}
+                <td><a href="{% url 'showsuitpic' test_cases_record.id %}" target="_blank">显示异常截图</a></td>
+                {% else %}
+                <td>无</td>
+                {% endif %}
+                <td>{{ test_cases_record.execute_start_time }}</td>
+		<td>{{ test_cases_record.execute_end_time}}</td>
+
+                </tr>
+	{% endfor %}
+                  
+             
+             </tbody>
+            </table>
+    </div>
+
+    {# 实现分页标签的代码 #}
+    {# 这里使用 bootstrap 渲染页面 #}
+    <div id="pages" class="text-center" >
+        <nav>
+            <ul class="pagination">
+                <li class="step-links">
+                {% if test_cases_records.has_previous %}
+                    <a class='active' href="?page={{ test_cases_records.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                <span class="current">
+                    第 {{ test_cases_records.number }} 页/共 {{ test_cases_records.paginator.num_pages }} 页</span>
+
+                {% if test_cases_records.has_next %}
+                    <a class='active' href="?page={{ test_cases_records.next_page_number }}">下一页</a>
+                {% endif %}
+                </li></ul></nav></div>
+{% endblock %}
