@@ -189,12 +189,12 @@ def web_suit_task(test_suit_record, test_suit):
     test_suit_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
     for test_suit_test_case in test_suit_test_cases:
         test_case = test_suit_test_case.test_case
-        # test_case_record = models.TestSuitTestCaseExecuteRecord.objects.create(test_suit_record=test_suit_record,
-        #                                                                        test_case=test_case)
+        test_suite_case_execute_record = models.TestSuitTestCaseExecuteRecord.objects.create(test_suit_record=test_suit_record,
+                                                                               test_case=test_case)
 
         server_address = "http://39.100.104.214:8000"
-        test_case_execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case)
-        case_execute_result = interface_test_task(test_case_execute_record, test_case, server_address)
+        # test_case_execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case)
+        case_execute_result = interface_test_task(test_suite_case_execute_record, test_case, server_address)
         if not case_execute_result :
             test_suit_record.test_result = "失败"
     test_suit_record.status = 1

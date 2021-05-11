@@ -28,21 +28,21 @@
  	{% for test_cases_record in test_cases_records %}
         	<tr>
 		<td>{{ test_cases_record.id }}</td>
-		<td>{{ test_cases_record.test_suit_record.test_suit.name }}</a></td>
-                <td><a href="{% url 'testsuitstepresult' test_cases_record.id%}">{{ test_cases_record.test_case.name }}</a></td>
+		<td>{{ test_cases_record.test_suit_record.test_suit.suite_desc }}</td>
+                <td><a href="">{{ test_cases_record.test_case.case_name }}</a></td>
                 {% if test_cases_record.status %}
                     <td>执行完毕</td>
                 {% else %}
                 <td>待执行</td>
                 {% endif %}
-		<td>{{ test_cases_record.test_result|default_if_none:"" }}</td>
+		<td>{{ test_cases_record.execute_result|default_if_none:"" }}</td>
                 {% if test_cases_record.exception_info %}
-                <td><a href="{% url 'showsuitception' test_cases_record.id %}" target="_blank">显示异常信息</a></td>
+                <td><a href="" target="_blank">显示异常信息</a></td>
                 {% else %}
                 <td>无</td>
                 {% endif %}
                 {% if test_cases_record.capture_screen %}
-                <td><a href="{% url 'showsuitpic' test_cases_record.id %}" target="_blank">显示异常截图</a></td>
+                <td><a href="" target="_blank">显示异常截图</a></td>
                 {% else %}
                 <td>无</td>
                 {% endif %}
