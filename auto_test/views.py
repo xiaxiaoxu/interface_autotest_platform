@@ -238,6 +238,13 @@ def show_test_suit_test_case_record(request, suit_record_id):
     test_cases_records = models.TestSuitTestCaseExecuteRecord.objects.filter(test_suit_record=test_suit_execute_record)
     return render(request, 'auto_test/testsuittestcaserecord.html',
                   {'test_cases_records': get_paginator(request, test_cases_records)})
+@login_required
+def test_suit_statistics(request,suit_id):
+    test_suit =  models.TestSuit.objects.get(id=suit_id)
+    success_num = len(models.TestSuitExecuteRecord.objects.filter(test_suit=test_suit,test_result ="成功"))
+    fail_num = len(models.TestSuitExecuteRecord.objects.filter(test_suit=test_suit,test_result ="失败"))
+    test_suit_records = models.TestSuitExecuteRecord.objects.filter(test_suit = test_suit).order_by('-id')
+    return render(request, 'auto_test/testsuitstatistics.html', {'test_suit_records': get_paginator(request,test_suit_records),'success_num':success_num,'fail_num':fail_num})
 
 
 @login_required

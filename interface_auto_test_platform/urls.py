@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^testsuitrecord/$', views.show_test_suit_record, name="showsuitrecord"),
     url(r'^suitecaserecord/(?P<suit_record_id>[0-9]+)$', views.show_test_suit_test_case_record, name="showsuitcaserecord"),
     url(r'^managesuit/(?P<suit_id>[0-9]+)$', views.managesuit, name="managesuit"),
+    url(r'^testsuitstatistics/(?P<suit_id>[0-9]+)$',views.test_suit_statistics,name="testsuitstatistics"),
     url(r"^exceptioninfo/(?P<execute_id>[0-9]+)$", views.show_exception, name="showexception"),
     url('^login/$', views.login),
     url('^logout/$', views.logout),
