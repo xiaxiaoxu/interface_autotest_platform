@@ -36,22 +36,12 @@
         </div>
 
        <div class="collapse navbar-collapse" id="my-nav">
-          <ul class="nav navbar-nav">
+          <ul id="mytab" class="nav navbar-nav">
             <li class="active"><a href="/project/">项目</a></li>
-          </ul>
-          <ul class="nav navbar-nav">
             <li class="active"><a href="/module/">模块</a></li>
-          </ul>
-           <ul class="nav navbar-nav">
             <li class="active"><a href="/testcase/">测试用例</a></li>
-          </ul>
-          <ul class="nav navbar-nav">
             <li class="active"><a href="/testrecord/">测试用例执行结果</a></li>
-          </ul>
-          <ul class="nav navbar-nav">
             <li class="active"><a href="/testsuit/">测试集合</a></li>
-          </ul>
-          <ul class="nav navbar-nav">
             <li class="active"><a href="/testsuitrecord/">测试集合执行结果</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -74,5 +64,10 @@
     <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script>
+     //$('#mytab a[href="#xw2"]').tab('show');
+     //#$('#mytab a:last').tab('show');
+     $('#mytab a:eq(1)').tab('show')
+ </script>
   </body>
 </html>
