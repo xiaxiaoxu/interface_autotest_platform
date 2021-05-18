@@ -41,8 +41,7 @@
 		<td>{{ module.desc }}</td>
 		<td>{{ module.create_time|date:"Y-n-d H:i" }}</td>
 		<td>{{ module.update_time|date:"Y-n-d H:i" }}</td>
-        <td><a href="">查看</a></td>
-		{# <td><a href="{% url 'testmodulestatistics' module.id%}">查看</a></td> #}
+		<td><a href="{% url 'testmodulestatistics' module.id%}">查看</a></td>
                 </tr>
 	 {% endfor %}
         

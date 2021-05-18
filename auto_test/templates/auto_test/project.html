@@ -35,8 +35,7 @@
 		<td>{{ project.desc }}</td>
 		<td>{{ project.create_time|date:"Y-n-d H:i" }}</td>
 		<td>{{ project.update_time|date:"Y-n-d H:i" }}</td>
-        <td><a href="{% url 'project' %}">  查看</a> </td>
-		{# <td><a href="{% url 'projectstatistics'  project.id%}">  查看</a> </td> #}
+		<td><a href="{% url 'projectstatistics'  project.id%}">  查看</a> </td>
                 </tr>
 	{% endfor %}
                   

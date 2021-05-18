@@ -29,7 +29,7 @@
         	<tr>
 		<td>{{ test_cases_record.id }}</td>
 		<td>{{ test_cases_record.test_suit_record.test_suit.suite_desc }}</td>
-                <td><a href="">{{ test_cases_record.test_case.case_name }}</a></td>
+                <td><a href="{% url 'testCaseDetail' test_cases_record.test_case.id%}">{{ test_cases_record.test_case.case_name }}</a></td>
                 {% if test_cases_record.status %}
                     <td>执行完毕</td>
                 {% else %}

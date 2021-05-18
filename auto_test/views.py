@@ -292,3 +292,28 @@ def managesuit(request, suit_id):
         testcases = models.TestCase.objects.filter().order_by('-id')
     return render(request, 'auto_test/managesuit.html',
                   {'testcases': get_paginator(request, testcases), 'test_suit': test_suit})
+
+@login_required
+def show_project_statistics(request,project_id):
+    test_project = models.Project.objects.get(id=int(project_id))
+    test_cases = models.TestCase.objects.filter(belong_project=test_project)
+    test_suit_success_num = len(models.TestSuitTestCaseExecuteRecord.objects.filter(test_case__in=test_cases,execute_result ="成功"))
+    test_suit_fail_num = len(models.TestSuitTestCaseExecuteRecord.objects.filter(test_case__in=test_cases,execute_result ="失败"))
+    test_case_success_num = len(models.TestCaseExecuteRecord.objects.filter(belong_test_case__in=test_cases,execute_result="成功"))
+    test_case_fail_num = len(models.TestCaseExecuteRecord.objects.filter(belong_test_case__in=test_cases,execute_result="失败"))
+    success_num = test_suit_success_num+test_case_success_num
+    fail_num = test_suit_fail_num + test_case_fail_num
+    return render(request, 'auto_test/projectstatistics.html', {'test_project': test_project,'success_num':success_num,'fail_num':fail_num})
+
+
+@login_required
+def show_module_statistics(request,module_id):
+    test_module = models.Module.objects.get(id=int(module_id))
+    test_cases = models.TestCase.objects.filter(belong_module=test_module)
+    test_suit_success_num = len(models.TestSuitTestCaseExecuteRecord.objects.filter(test_case__in=test_cases,execute_result ="成功"))
+    test_suit_fail_num = len(models.TestSuitTestCaseExecuteRecord.objects.filter(test_case__in=test_cases,execute_result ="失败"))
+    test_case_success_num = len(models.TestCaseExecuteRecord.objects.filter(belong_test_case__in=test_cases,execute_result="成功"))
+    test_case_fail_num = len(models.TestCaseExecuteRecord.objects.filter(belong_test_case__in=test_cases,execute_result="失败"))
+    success_num = test_suit_success_num+test_case_success_num
+    fail_num = test_suit_fail_num + test_case_fail_num
+    return render(request, 'auto_test/modulestatistics.html', {'test_module': test_module,'success_num':success_num,'fail_num':fail_num})

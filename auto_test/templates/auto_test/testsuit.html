@@ -79,13 +79,13 @@ function ischecked()
         	<tr>
                 <td><input type="checkbox" value="{{ testsuit.id }}" name="testsuits_list" > </td>
                 <td>{{ testsuit.id }}</td>
-		<td>{{ testsuit.suite_desc }}</td>
-		<td>{{ testsuit.creator }}</td>
-		<td>{{ testsuit.create_time|date:"Y-n-d H:i" }}</td>
+                <td>{{ testsuit.suite_desc }}</td>
+                <td>{{ testsuit.creator }}</td>
+                <td>{{ testsuit.create_time|date:"Y-n-d H:i" }}</td>
                 <td><a href="{% url 'suitcases' testsuit.id %}">查看/删除集合测试用例</a></td>
                 <td><a href="{% url 'managesuit' testsuit.id %}">添加集合测试用例</a></td>
                 <td><a href="{% url 'testsuitstatistics' testsuit.id %}">查看测试集合执行结果</a></td>
-                </tr>
+            </tr>
 	{% endfor %}
                   
              

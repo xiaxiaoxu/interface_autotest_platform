@@ -77,8 +77,7 @@ function ischecked()
  	{% for testcase in testcases %}
         	<tr>
 		<td><input type="checkbox" value="{{ testcase.id }}" name="testcases_list" > {{ testcase.id }}</td>
-		{# <td><a href = "{% url 'caseteststep' testcase.id%}">{{ testcase.case_name }}</a></td> #}
-		<td><a href = "">{{ testcase.case_name }}</a></td>
+		<td><a href = "{% url 'testCaseDetail' testcase.id%}">{{ testcase.case_name }}</a></td>
 		<td>{{ testcase.belong_project.name }}</td>
 		<td>{{ testcase.belong_module.name }}</td>
 		<td>{{ testcase.maintainer }}</td>
