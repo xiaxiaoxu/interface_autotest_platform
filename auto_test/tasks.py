@@ -13,7 +13,7 @@ ip = "39.100.104.214"
 port = "8000"
 
 
-@shared_task
+
 def web_test_task(execute_id, testcase_id):
     test_steps = models.CaseStep.objects.filter(test_case=testcase_id)
     execute_record = models.TestCaseExecuteRecord.objects.get(id=execute_id)
@@ -105,7 +105,7 @@ def web_test_task(execute_id, testcase_id):
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
     execute_record.save()
 
-
+@shared_task
 def interface_test_task(execute_record, test_case, server_address):
     execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
     print("execute_start_time: {}".format(execute_start_time))
@@ -182,7 +182,7 @@ def interface_test_task(execute_record, test_case, server_address):
         execute_record.exception_info = e
         execute_record.save()
 
-
+@shared_task
 def web_suit_task(test_suit_record, test_suit):
     test_suit_test_cases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)
     test_suit_record.test_result = "成功"

@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -140,3 +141,6 @@ pymysql.version_info = (1, 3, 13, "final", 0)   #此行在启动出错后有需�
 pymysql.install_as_MySQLdb()
 
 
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # Broker配置，使用Redis作为消息中间件
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1' # BACKEND配置，这里使用redis
+CELERY_RESULT_SERIALIZER = 'json' # 结果序列化方案

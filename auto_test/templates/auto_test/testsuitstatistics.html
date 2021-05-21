@@ -19,6 +19,7 @@
         echarts.init(document.getElementById('main')).setOption({
             series: {
                 type: 'pie',
+                color: ['green', 'red'],
                 data: [
                     {name: '成功的用例', value: {{ success_num }}},
                     {name: '失败的用例', value: {{ fail_num }}},

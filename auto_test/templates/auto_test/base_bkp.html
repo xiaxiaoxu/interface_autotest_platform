@@ -1,6 +1,5 @@
 {% load static %}
 
-<!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8">
@@ -11,6 +10,7 @@
 
     <!-- Bootstrap -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
 
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -20,9 +20,33 @@
       <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     {% block css %}{% endblock %}
+    <style type="text/css">
+		.navbar {
+          background-color: #0eab88;
+        }
+        .navbar .navbar-brand {
+          color: #070707;
+        }
+        .navbar .navbar-brand:hover,
+        .navbar .navbar-brand:focus {
+          color: #040404;
+        }
+        .navbar .navbar-text {
+          color: #070707;
+        }
+        .navbar .navbar-text a {
+          color: #040404;
+        }
+        .navbar .navbar-text a:hover,
+        .navbar .navbar-text a:focus {
+          color: #040404;
+        }
+        }
+	</style>
   </head>
-  <body>
-    <nav class="navbar navbar-default" style="background-color: #e3f2fd;">
+  <body style="padding-top: 10px;">
+    <nav class="navbar fixed-top navbar-light" style="background-color: #e3f2fd;">
+<!--    <nav class="navbar fixed-top navbar-default">-->
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -37,12 +61,12 @@
 
        <div class="collapse navbar-collapse" id="my-nav">
           <ul class="nav navbar-nav">
-            <li id="tab1" ><a href="/project/">项目</a></li>
-            <li id="tab2" ><a href="/module/">模块</a></li>
-            <li><a href="/testcase/">测试用例</a></li>
-            <li><a href="/testrecord/">测试用例执行结果</a></li>
-            <li><a href="/testsuit/">测试集合</a></li>
-            <li><a href="/testsuitrecord/">测试集合执行结果</a></li>
+            <li id="tab1"><a class="active" href="/project/">项目</a></li>
+            <li id="tab2"><a href="/module/">模块</a></li>
+            <li id="tab3"><a href="/testcase/">测试用例</a></li>
+            <li id="tab4"><a href="/testrecord/">测试用例执行结果</a></li>
+            <li id="tab5" class="active"><a href="/testsuit/">测试集合</a></li>
+            <li id="tab6" class="active"><a href="/testsuitrecord/">测试集合执行结果</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
               {% if request.user.is_authenticated %}
@@ -64,16 +88,10 @@
     <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-    <script>
-<!--        function changeStyle(){-->
-<!--            console.log('in script')-->
-<!--            var ele = document.getElementByid('tab1');-->
-<!--            ele.addClass('active')-->
-<!--        }-->
+  <script>
        $('#tab1').on('click', function () {
-         console.log('in script')
          $('#tab1').addClass('active');
-        });
-   </script>
+    });
+ </script>
   </body>
 </html>

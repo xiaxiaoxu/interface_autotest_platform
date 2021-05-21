@@ -130,7 +130,7 @@ def testcase(request):
                 print("test_case: {}".format(test_case))
                 print("test_case[0]: {}".format(test_case[0]))
                 test_case_execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case[0])
-                tasks.interface_test_task(test_case_execute_record, test_case[0], server_address)
+                tasks.interface_test_task.apply_async(test_case_execute_record, test_case[0], server_address)
                 # task_id=tasks.web_test_task.apply_async((test_case_execute_record.id,test_case[0]),countdown=0)
         else:
             print("运行测试用例失败")
@@ -208,7 +208,7 @@ def testsuit(request):
                                                                                run_time_interval=count_down_time,
                                                                                creator=username)
 
-                tasks.web_suit_task(test_suit_record, testsuit)
+                tasks.web_suit_task.apply_async(test_suit_record, testsuit)
                 # task_id = tasks.web_suit_task.apply_async((test_suit_record.id, int(testsuit ),
                 #                                           countdown=count_down_time)
                 # web_suit_task
