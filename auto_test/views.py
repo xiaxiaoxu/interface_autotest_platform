@@ -42,7 +42,7 @@ def index(request):
 
 def login(request):
     if request.session.get('is_login', None):
-        return redirect('/project')
+        return redirect('/index')
 
     if request.method == "POST":
         login_form = UserForm(request.POST)
@@ -56,7 +56,8 @@ def login(request):
                     print("**********" * 10, )
                     auth.login(request, user)
                     request.session['is_login'] = True
-                    return redirect('/project/')
+                    request.session['user_name'] = username
+                    return redirect('/index/')
                 else:
                     message = "用户名不能存在或者密码不正确！"
             except:
@@ -109,6 +110,7 @@ def get_server_address(env):
 
 @login_required
 def testcase(request):
+    print("request.session['is_login']: {}".format(request.session['is_login']))
     testcases = ""
     if request.method == "GET":
         testcases = models.TestCase.objects.filter().order_by('id')
@@ -177,13 +179,15 @@ def test_case_detail(request, testcase_id):
 
 
 def register(request):
-    pass
     return render(request, 'auto_test/register.html')
 
 
+@login_required
 def logout(request):
-    pass
-    return redirect('/index/')
+    auth.logout(request)
+    request.session.flush()
+    return redirect("/login/")
+
 
 
 @login_required
