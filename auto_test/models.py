@@ -73,7 +73,7 @@ class TestCase(models.Model):
     status = models.IntegerField(null=True, help_text="0：表示有效，1：表示无效，用于软删除")
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     updated_time = models.DateTimeField('更新时间', auto_now=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='所属用户', null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='责任人', null=True)
 
     def __str__(self):
         return self.case_name
@@ -85,7 +85,7 @@ class TestCase(models.Model):
 
 class TestCaseAdmin(admin.ModelAdmin):
     list_display = (
-    "id", "case_name", "belong_project", "belong_module", "maintainer", "user", "created_time", "updated_time")
+    "id", "case_name", "belong_project", "belong_module", "uri", "request_method", "request_data", "assert_key", "extract_var", "user", "created_time", "updated_time")
 
 
 class TestCaseExecuteRecord(models.Model):

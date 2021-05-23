@@ -2,7 +2,7 @@
 from celery import shared_task
 from . import models
 from .utils.api_request import api_request
-from .utils.dataHandler import data_handler
+from .utils.dataHandler import data_handler, assert_result
 import os
 import json
 import traceback
@@ -107,6 +107,7 @@ def web_test_task(execute_id, testcase_id):
 
 @shared_task
 def interface_test_task(execute_record, test_case, server_address):
+    os.environ['global_vars'] = '{}'
     execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
     print("execute_start_time: {}".format(execute_start_time))
     execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_start_time))
@@ -145,16 +146,29 @@ def interface_test_task(execute_record, test_case, server_address):
     print("request_method: {}".format(request_method))
     url = "{}/{}".format(server_address, interface_name)
     print("url: {}".format(url))
-    request_data = data_handler(str(request_data))
+    code, request_data, error_msg = data_handler(str(request_data))
     print("request_data: {}".format(request_data))
+    if code != 0:
+        print("数据处理异常，error: {}".format(error_msg))
+        execute_record.execute_result = "失败"
+        execute_record.status = 1
+        execute_record.exception_info = error_msg
+        execute_end_time = time.time()
+        execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_end_time))
+        print("execute_record.execute_end_time: {}".format(execute_record.execute_end_time))
+        execute_record.execute_total_time = int(execute_end_time - execute_start_time) * 1000
+        print("execute_record.execute_total_time: {}".format(execute_record.execute_total_time))
+        execute_record.save()
+        return False
     execute_record.request_data = request_data
     try:
         res_data = api_request(url, request_method, json.loads(request_data))
         print("res_data.json(): {}".format(res_data.json()))
-        if res_data.json().get("code", "") == "00":
+        if assert_result(res_data, assert_key):
+        # if res_data.json().get("code", "") == "00":
             print("用例执行成功")
             execute_record.execute_result = "成功"
-            execute_record.response_data = res_data.text
+            execute_record.response_data = res_data.json()
             execute_record.status = 1
             execute_end_time = time.time()
             print("execute_end_time: {}".format(execute_end_time))
@@ -168,7 +182,7 @@ def interface_test_task(execute_record, test_case, server_address):
         else:
             print("用例执行失败")
             execute_record.execute_result = "失败"
-            execute_record.response_data = res_data.text
+            execute_record.response_data = res_data.json()
             execute_record.status = 1
             execute_end_time = time.time()
             execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_end_time))
@@ -176,14 +190,23 @@ def interface_test_task(execute_record, test_case, server_address):
             execute_record.execute_total_time = int(execute_end_time - execute_start_time) * 1000
             print("execute_record.execute_total_time: {}".format(execute_record.execute_total_time))
             execute_record.save()
-            return False  # 成功返回1，用于test_suite判断结果
+            return False  # 失败返回，用于test_suite判断结果
     except Exception as e:
         print("接口请求异常，error: {}".format(e))
+        execute_record.execute_result = "失败"
         execute_record.exception_info = e
+        execute_record.status = 1
+        execute_end_time = time.time()
+        execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_end_time))
+        print("execute_record.execute_end_time: {}".format(execute_record.execute_end_time))
+        execute_record.execute_total_time = int(execute_end_time - execute_start_time) * 1000
+        print("execute_record.execute_total_time: {}".format(execute_record.execute_total_time))
         execute_record.save()
+        return False
 
 @shared_task
 def web_suit_task(test_suit_record, test_suit):
+    os.environ['global_vars'] = {}
     test_suit_test_cases = models.TestSuitTestCases.objects.filter(test_suit=test_suit)
     test_suit_record.test_result = "成功"
     test_suit_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")

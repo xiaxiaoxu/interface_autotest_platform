@@ -3,25 +3,32 @@ import re
 import pickle
 import hashlib
 import os
+import json
+import traceback
 from .api_request import api_request
 
 
 #初始化框架工程中的全局变量，存储在测试数据中的唯一值数据
 #框架工程中若要使用字典中的任意一个变量，则每次使用后，均需要将字典中的value值进行加1操作。
-global_vars = {}
+
+# os.environ['global_vars'] = {}
 proj_path = os.path.dirname(os.path.dirname(__file__))
 data_file = os.path.join(proj_path,"config\\staticDataFile")
 
 
 def get_unique_number_value(unique_number):
-    global global_vars
+    data = None
     try:
         with open(data_file,"rb") as fp:
             var = pickle.load(fp) # 读取pickle序列化字节流文件中内容，反序列化成python的字典对象：{"unique_num1":100,"unique_num2":1000}
             print("字节流文件内容: %s" % var)
             data= var[unique_number] # 获取字典对象中key为unique_number的值
             print("全局唯一数当前生成的值是：%s" %data)
-            global_vars[unique_number]=str(data)
+            global_vars = json.loads(os.environ['global_vars'])
+            print("global_vars: {}".format(global_vars))
+            global_vars[unique_number]=data
+            os.environ['global_vars'] = json.dumps(global_vars)
+            print("os.environ['global_vars']: {}".format(os.environ['global_vars']))
             var[unique_number] +=1 # 把字典对象中key为unique_number的值进行加一操作，以便下提取时保持唯一
         with open(data_file,"wb") as fp:
             pickle.dump(var,fp) # 修改后的字典对象，序列化到字节流文件中
@@ -40,47 +47,58 @@ def md5(s):
 
 # 将请求数据中包含的${变量名}的字符串部分，替换为唯一数或者全局变量字典中对应的全局变量
 def data_handler(requestData):
-    if re.search(r"\$\{unique_num\d+\}", requestData):  # 匹配用户名参数，即"${www}"的格式
-        var_name = re.search(r"\$\{(unique_num\d+)\}", requestData).group(1)  # 获取用户名参数
-        print("var_name:%s" % var_name)
-        var_value = get_unique_number_value(var_name)
-        print("var_value: %s" % var_value)
-        requestData = re.sub(r"\$\{unique_num\d+\}", str(var_value), requestData)
-        var_name = var_name.split("_")[1]
-        print("var_name: %s" % var_name)
-        global_vars[var_name] = var_value
-        print("global_vars: %s" % str(global_vars))
-
-    if re.search(r"\$\{\w+\(.+\)\}", requestData):  # 匹配密码参数,即"${xxx()}"的格式
-        var_pass = re.search(r"\$\{(\w+\(.+\))\}", requestData).group(1)  # 获取密码参数
-        print("var_pass: %s" % var_pass)
-        print("eval(var_pass): %s" % eval(var_pass))
-        requestData = re.sub(r"\$\{\w+\(.+\)\}", eval(var_pass), requestData)  # 将requestBody里面的参数内容通过eval修改为实际变量值
-        print("requestBody after replace: %s" % requestData)  # requestBody是拿到的请求时发送的数据
-
-    if re.search(r"\$\{(\w+)\}", requestData):
-        print("all mached data: %s" % (re.findall(r"\$\{(\w+)\}", requestData)))
-        for var_name in re.findall(r"\$\{(\w+)\}", requestData):
-            print("替换前 data: %s" % requestData)
-            requestData = re.sub(r"\$\{%s\}" % var_name, str(global_vars[var_name]), requestData)
-            print("替换后 data: %s" % requestData )
-
-    return requestData
-
-#发送接口请求数据到接口的服务器 url 地址
-def send_request(interface_name, data):
-    data = data_handler(data)
     try:
-        responseObj = api_request(eval(interface_name)[1], eval(interface_name)[0], eval(data))
-        return responseObj, data
+        if re.search(r"\$\{unique_num\d+\}", requestData):  # 匹配用户名参数，即"${www}"的格式
+            var_name = re.search(r"\$\{(unique_num\d+)\}", requestData).group(1)  # 获取用户名参数
+            print("var_name:%s" % var_name)
+            var_value = get_unique_number_value(var_name)
+            print("var_value: %s" % var_value)
+            requestData = re.sub(r"\$\{unique_num\d+\}", str(var_value), requestData)
+            var_name = var_name.split("_")[1]
+            print("var_name: %s" % var_name)
+            global_vars = json.loads(os.environ['global_vars'])
+            print("global_vars: {}".format(global_vars))
+            global_vars[var_name] = var_value
+            os.environ['global_vars'] = json.dumps(global_vars)
+            print("os.environ['global_vars']: {}".format(os.environ['global_vars']))
+
+        if re.search(r"\$\{\w+\(.+\)\}", requestData):  # 匹配密码参数,即"${xxx()}"的格式
+            var_pass = re.search(r"\$\{(\w+\(.+\))\}", requestData).group(1)  # 获取密码参数
+            print("var_pass: %s" % var_pass)
+            print("eval(var_pass): %s" % eval(var_pass))
+            requestData = re.sub(r"\$\{\w+\(.+\)\}", eval(var_pass), requestData)  # 将requestBody里面的参数内容通过eval修改为实际变量值
+            print("requestBody after replace: %s" % requestData)  # requestBody是拿到的请求时发送的数据
+
+        if re.search(r"\$\{(\w+)\}", requestData):
+            print("all mached data: %s" % (re.findall(r"\$\{(\w+)\}", requestData)))
+            for var_name in re.findall(r"\$\{(\w+)\}", requestData):
+                print("替换前 data: %s" % requestData)
+                requestData = re.sub(r"\$\{%s\}" % var_name, str(json.loads(os.environ['global_vars'])[var_name]), requestData)
+                print("替换后 data: %s" % requestData )
+        return 0, requestData, ""
     except Exception as e:
-        print("调用接口的函数参数出错，调用的参数为%s" % interface_name, "\n错误信息: ", e)
-        return None, data
+        print("数据处理发生异常，error：{}".format(traceback.format_exc()))
+        return 1, {}, traceback.format_exc()
+
+
+
+
+
+# #发送接口请求数据到接口的服务器 url 地址
+# def send_request(interface_name, data):
+#     data = data_handler(data)
+#     try:
+#         responseObj = api_request(eval(interface_name)[1], eval(interface_name)[0], eval(data))
+#         return responseObj, data
+#     except Exception as e:
+#         print("调用接口的函数参数出错，调用的参数为%s" % interface_name, "\n错误信息: ", e)
+#         return None, data
 
 
 #断言处理，有多个断言词的情况
 def assert_result(responseObj,key_word):
     '''验证数据正确性'''
+    print('key_word in assert_result: {}'.format(key_word))
 
     try:
         if '||' in key_word:
@@ -90,11 +108,15 @@ def assert_result(responseObj,key_word):
             flag = True
             # 遍历分隔出来的断言关键词列表
             for keyWord in key_word_list:
+                if '"'in keyWord:
+                    keyWord = keyWord.replace('"', "'")
                 print("keyWord: %s" % keyWord)
+
                 # 如果断言词非空，则进行断言
                 if keyWord:
+                    print("str(responseObj.json()): {}".format(str(responseObj.json())))
                     # 没查到断言词则认为是断言失败
-                    if not re.search(keyWord, responseObj.text):
+                    if not (keyWord in str(responseObj.json())):
                         print("断言失败，关键词为： %s" % keyWord)
                         flag = False
             print("flag: %s" % flag)
@@ -104,14 +126,14 @@ def assert_result(responseObj,key_word):
 
         else:
             print("key_word: %s" % key_word)
-            if re.search(key_word, responseObj.text):
+            if key_word in str(responseObj.json()):
                 print("断言成功")
                 return True
             else:
                 print("断言失败，断言词为: %s" % key_word)
                 return False
     except Exception as e:
-        logger.error("error occurs in assert_result function: %s" % e)
+        print("error occurs in assert_result function: %s" % e)
         return False
 
 

@@ -20,6 +20,7 @@
                   <th width="20%">执行返回结果</th>
                   <th width="10%">断言内容</th>
                   <th width="5%">执行结果</th>
+                  <th width="5%">异常信息</th>
                   <th width="10%">请求后提取变量</th>
                   <th width="8%">开始时间</th>
                   <th width="10%">执行耗时(ms)</th>
@@ -46,6 +47,7 @@
                 <td>{{ test_case_record.response_data }}</td>
                 <td>{{ test_case_record.test_case.assert_key }}</td>
                 <td>{{ test_case_record.execute_result|default_if_none:"" }}</td>
+                <td>{{ test_case_record.exception_info|default_if_none:"" }}</td>
                 <td>{{ test_case_record.test_case.extract_var }}</td>
                 <td>{{ test_case_record.execute_start_time }}</td>
                 <td>{{ test_case_record.execute_total_time }}</td>
