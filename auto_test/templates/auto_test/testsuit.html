@@ -56,43 +56,48 @@ function ischecked()
 </script>
 
     <form action="" method="POST">
-    {% csrf_token %}
-    <input type="text"  name="delay_time">请输入延迟执行的时间（单位：秒）</input>
-    <input type="submit" id="all_check1" value='运行测试集合' onclick="return ischecked()"/>
-    <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
+        {% csrf_token %}
+        <input type="text" style="width: 50px; margin-left: 20px; margin-right: 10px;" name="delay_time">请输入延迟执行的时间（单位：秒）</input>
+        <span style="margin-left: 5px;">运行环境：</span>
+        <select name="env">
+            <option selected value="dev">dev</option>
+            <option value="prod">prod</option>
+        </select>
+        <input type="submit" id="all_check1" value='运行测试集合' onclick="return ischecked()"/>
+        <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th><input type="checkbox" id="all_check" onclick="checkOrCancelAll();"/>全选</th>
+                      <th>序号</th>
+                      <th>测试集合名称</th>
+                      <th>创建者</th>
+                      <th>创建时间</th>
+                      <th>集合测试用例</th>
+                      <th>管理集合测试用例</th>
+                      <th>测试集合执行结果</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+        {% for testsuit in testsuits %}
                 <tr>
-                  <th><input type="checkbox" id="all_check" onclick="checkOrCancelAll();"/>全选</th>
-                  <th>序号</th>
-                  <th>测试集合名称</th>
-                  <th>创建者</th>
-                  <th>创建时间</th>
-                  <th>集合测试用例</th>
-                  <th>管理集合测试用例</th>
-                  <th>测试集合执行结果</th>
+                    <td><input type="checkbox" value="{{ testsuit.id }}" name="testsuits_list" > </td>
+                    <td>{{ testsuit.id }}</td>
+                    <td>{{ testsuit.suite_desc }}</td>
+                    <td>{{ testsuit.creator }}</td>
+                    <td>{{ testsuit.create_time|date:"Y-n-d H:i" }}</td>
+                    <td><a href="{% url 'suitcases' testsuit.id %}">查看/删除集合测试用例</a></td>
+                    <td><a href="{% url 'managesuit' testsuit.id %}">添加集合测试用例</a></td>
+                    <td><a href="{% url 'testsuitstatistics' testsuit.id %}">查看测试集合执行结果</a></td>
                 </tr>
-                </thead>
-                <tbody>
-          
- 	{% for testsuit in testsuits %}
-        	<tr>
-                <td><input type="checkbox" value="{{ testsuit.id }}" name="testsuits_list" > </td>
-                <td>{{ testsuit.id }}</td>
-                <td>{{ testsuit.suite_desc }}</td>
-                <td>{{ testsuit.creator }}</td>
-                <td>{{ testsuit.create_time|date:"Y-n-d H:i" }}</td>
-                <td><a href="{% url 'suitcases' testsuit.id %}">查看/删除集合测试用例</a></td>
-                <td><a href="{% url 'managesuit' testsuit.id %}">添加集合测试用例</a></td>
-                <td><a href="{% url 'testsuitstatistics' testsuit.id %}">查看测试集合执行结果</a></td>
-            </tr>
-	{% endfor %}
-                  
-             
-             </tbody>
-            </table>
-    </from>
-    </div>
+        {% endfor %}
+
+
+                 </tbody>
+                </table>
+        </div>
+    </form>
 
     {# 实现分页标签的代码 #}
     {# 这里使用 bootstrap 渲染页面 #}
