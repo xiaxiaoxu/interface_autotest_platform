@@ -57,13 +57,14 @@ function ischecked()
 
     <form action="" method="POST">
         {% csrf_token %}
-        <input type="text" style="width: 50px; margin-left: 20px; margin-right: 10px;" name="delay_time">请输入延迟执行的时间（单位：秒）</input>
+        <span style="margin-left: 5px;">延迟执行的时间（单位：秒）:</span>
+        <input type="text" style="width: 70px; margin-left: 5px; margin-right: 10px;" placeholder="请输入" name="delay_time"/>
         <span style="margin-left: 5px;">运行环境：</span>
         <select name="env">
             <option selected value="dev">dev</option>
             <option value="prod">prod</option>
         </select>
-        <input type="submit" id="all_check1" value='运行测试集合' onclick="return ischecked()"/>
+        <input style="margin-left: 10px;" type="submit" id="all_check1" value='运行测试集合' onclick="return ischecked()"/>
         <div class="table-responsive">
                 <table class="table table-striped">
                   <thead>
