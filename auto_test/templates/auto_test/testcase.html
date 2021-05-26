@@ -57,7 +57,7 @@ function ischecked()
 
 <form action="" method="POST">
 {% csrf_token %}
-<input type="submit" id="" value='all_check1运行后台测试用例' onclick="return ischecked()"/>
+<input type="submit" value='运行后台测试用例' onclick="return ischecked()"/>
 <span style="margin-left: 5px;">运行环境：</span>
 <select name="env">
     <option selected value="dev">dev</option>
@@ -67,7 +67,7 @@ function ischecked()
             <table class="table table-striped">
               <thead>        
                 <tr>
-                  <th><input type="checkbox" id="all_check" onclick="checkOrCancelAll();"/>序号</th>
+                  <th><input type="checkbox" id="all_check" onclick="checkOrCancelAll();"/>全选</th>
                   <th>用例名称</th>
                   <th>所属项目</th>
                   <th>所属模块</th>

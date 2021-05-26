@@ -105,7 +105,7 @@ def web_test_task(execute_id, testcase_id):
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()).split(".")[0])
     execute_record.save()
 
-# @shared_task
+@shared_task
 def interface_test_task(test_case_id_list, server_address):
     os.environ['global_vars'] = '{}'
     for test_case_id in test_case_id_list:
@@ -206,7 +206,7 @@ def interface_test_task(test_case_id_list, server_address):
             execute_record.save()
 
 
-# @shared_task
+@shared_task
 def web_suit_task(test_suit_record, test_suit):
     os.environ['global_vars'] = '{}'
     server_address = "http://39.100.104.214:8000"
