@@ -128,7 +128,8 @@ def testcase(request):
         if test_case_id_list:
             test_case_id_list.sort()
             print("test_case_id_list: {}".format(test_case_id_list))
-            tasks.interface_test_task.apply_async((test_case_id_list, server_address))
+            # tasks.interface_test_task.apply_async((test_case_id_list, server_address))
+            tasks.interface_test_task(test_case_id_list, server_address)
             # for testcase in testcase_id_list:
             #     test_case = models.TestCase.objects.filter(id=int(testcase))
             #     print("test_case: {}".format(test_case))
@@ -215,8 +216,8 @@ def testsuit(request):
                                                                                run_time_interval=count_down_time,
                                                                                creator=username)
 
-                tasks.web_suit_task.apply_async((test_suit_record, testsuit))
-                # tasks.web_suit_task(test_suit_record, testsuit)
+                # tasks.web_suit_task.apply_async((test_suit_record, testsuit))
+                tasks.web_suit_task(test_suit_record, testsuit)
                 # task_id = tasks.web_suit_task.apply_async((test_suit_record.id, int(testsuit ),
                 #                                           countdown=count_down_time)
                 # web_suit_task

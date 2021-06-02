@@ -24,11 +24,11 @@ def get_unique_number_value(unique_number):
             print("字节流文件内容: %s" % var)
             data= var[unique_number] # 获取字典对象中key为unique_number的值
             print("全局唯一数当前生成的值是：%s" %data)
-            global_vars = json.loads(os.environ['global_vars'])
-            print("global_vars: {}".format(global_vars))
-            global_vars[unique_number]=data
-            os.environ['global_vars'] = json.dumps(global_vars)
-            print("os.environ['global_vars']: {}".format(os.environ['global_vars']))
+            # global_vars = json.loads(os.environ['global_vars'])
+            # print("global_vars: {}".format(global_vars))
+            # global_vars[unique_number]=data
+            # os.environ['global_vars'] = json.dumps(global_vars)
+            # print("os.environ['global_vars']: {}".format(os.environ['global_vars']))
             var[unique_number] +=1 # 把字典对象中key为unique_number的值进行加一操作，以便下提取时保持唯一
         with open(data_file,"wb") as fp:
             pickle.dump(var,fp) # 修改后的字典对象，序列化到字节流文件中
@@ -46,7 +46,7 @@ def md5(s):
 
 
 # 将请求数据中包含的${变量名}的字符串部分，替换为唯一数或者全局变量字典中对应的全局变量
-def data_handler(requestData):
+def data_handler(global_key, requestData):
     try:
         if re.search(r"\$\{unique_num\d+\}", requestData):  # 匹配用户名参数，即"${www}"的格式
             var_name = re.search(r"\$\{(unique_num\d+)\}", requestData).group(1)  # 获取用户名参数
@@ -57,8 +57,9 @@ def data_handler(requestData):
             var_name = var_name.split("_")[1]
             print("var_name: %s" % var_name)
             global_vars = json.loads(os.environ['global_vars'])
-            print("global_vars: {}".format(global_vars))
-            global_vars[var_name] = var_value
+            print("global_vars before assignment in data_handler : {}".format(global_vars))
+            global_vars[str(global_key)][var_name] = var_value
+            print("global_vars after assignment in data_handler : {}".format(global_vars))
             os.environ['global_vars'] = json.dumps(global_vars)
             print("os.environ['global_vars']: {}".format(os.environ['global_vars']))
 
@@ -67,14 +68,15 @@ def data_handler(requestData):
             print("var_pass: %s" % var_pass)
             print("eval(var_pass): %s" % eval(var_pass))
             requestData = re.sub(r"\$\{\w+\(.+\)\}", eval(var_pass), requestData)  # 将requestBody里面的参数内容通过eval修改为实际变量值
-            print("requestBody after replace: %s" % requestData)  # requestBody是拿到的请求时发送的数据
+            print("替换函数调用后，requestData: %s" % requestData)  # requestBody是拿到的请求时发送的数据
 
         if re.search(r"\$\{(\w+)\}", requestData):
             print("all mached data: %s" % (re.findall(r"\$\{(\w+)\}", requestData)))
             for var_name in re.findall(r"\$\{(\w+)\}", requestData):
-                print("替换前 data: %s" % requestData)
-                requestData = re.sub(r"\$\{%s\}" % var_name, str(json.loads(os.environ['global_vars'])[var_name]), requestData)
-                print("替换后 data: %s" % requestData )
+                print("替换参数化变量之前 requestData: %s" % requestData)
+                print("json.loads(os.environ['global_vars']): {}".format(json.loads(os.environ['global_vars'])))
+                requestData = re.sub(r"\$\{%s\}" % var_name, str(json.loads(os.environ['global_vars'])[str(global_key)][var_name]), requestData)
+                print("替换参数化变量之后 requestData: %s" % requestData )
         return 0, requestData, ""
     except Exception as e:
         print("数据处理发生异常，error：{}".format(traceback.format_exc()))
@@ -101,8 +103,8 @@ def assert_result(responseObj,key_word):
     print('key_word in assert_result: {}'.format(key_word))
 
     try:
-        if '||' in key_word:
-            key_word_list = key_word.split('||')
+        if '&&' in key_word:
+            key_word_list = key_word.split('&&')
             print("key_word_list: %s" % key_word_list)
             # 断言结果标识符
             flag = True
@@ -119,6 +121,8 @@ def assert_result(responseObj,key_word):
                     if not (keyWord in str(responseObj.json())):
                         print("断言失败，关键词为： %s" % keyWord)
                         flag = False
+                    else:
+                        print("断言词匹配成功：'{}'".format(keyWord))
             print("flag: %s" % flag)
             if flag:
                 print("断言成功")

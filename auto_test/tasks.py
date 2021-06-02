@@ -14,12 +14,13 @@ from dateutil.parser import parse
 
 @shared_task
 def interface_test_task(test_case_id_list, server_address):
-    os.environ['global_vars'] = '{}'
+    global_key = int(time.time()*100000)
+    global_vars = {"{}".format(global_key): {}}
+    os.environ['global_vars'] = json.dumps(global_vars)
     for test_case_id in test_case_id_list:
         test_case = models.TestCase.objects.filter(id=int(test_case_id))[0]
         print("######执行用例: {}".format(test_case))
         execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case)
-
         execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
         print("execute_start_time: {}".format(execute_start_time))
         execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_start_time))
@@ -58,7 +59,7 @@ def interface_test_task(test_case_id_list, server_address):
         print("request_method: {}".format(request_method))
         url = "{}/{}".format(server_address, interface_name)
         print("url: {}".format(url))
-        code, request_data, error_msg = data_handler(str(request_data))
+        code, request_data, error_msg = data_handler(global_key, str(request_data))
         print("request_data: {}".format(request_data))
         if code != 0:
             print("数据处理异常，error: {}".format(error_msg))
@@ -113,9 +114,10 @@ def interface_test_task(test_case_id_list, server_address):
             execute_record.save()
 
 
-@shared_task
+# @shared_task
 def web_suit_task(test_suit_record, test_suit):
-    os.environ['global_vars'] = '{}'
+    global_vars = {"{}".format(test_suit_record.id): {}}
+    os.environ['global_vars'] = json.dumps(global_vars)
     server_address = "http://39.100.104.214:8000"
     test_suit_test_cases = models.TestSuitTestCases.objects.filter(test_suit=test_suit).order_by('id')
     print("test_suit_test_cases: {}".format(test_suit_test_cases))
@@ -149,7 +151,7 @@ def web_suit_task(test_suit_record, test_suit):
         print("request_method: {}".format(request_method))
         url = "{}/{}".format(server_address, interface_name)
         print("url: {}".format(url))
-        code, request_data, error_msg = data_handler(str(request_data))
+        code, request_data, error_msg = data_handler(test_suit_record.id, str(request_data))
         print("request_data: {}".format(request_data))
         if code != 0:
             print("数据处理异常，error: {}".format(error_msg))
