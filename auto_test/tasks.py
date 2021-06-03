@@ -76,8 +76,9 @@ def interface_test_task(test_case_id_list, server_address):
         try:
             res_data = api_request(url, request_method, json.loads(request_data))
             print("res_data.json(): {}".format(res_data.json()))
-            if assert_result(res_data, assert_key):
-            # if res_data.json().get("code", "") == "00":
+
+            result_code, exception_info  = assert_result(res_data, assert_key)
+            if result_code:
                 print("用例执行成功")
                 execute_record.execute_result = "成功"
                 execute_record.response_data = res_data.json()
@@ -94,6 +95,7 @@ def interface_test_task(test_case_id_list, server_address):
                 print("用例执行失败")
                 execute_record.execute_result = "失败"
                 execute_record.response_data = res_data.json()
+                execute_record.exception_info = exception_info
                 execute_record.status = 1
                 execute_end_time = time.time()
                 execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_end_time))

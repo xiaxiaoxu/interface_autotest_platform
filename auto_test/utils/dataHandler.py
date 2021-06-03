@@ -108,6 +108,7 @@ def assert_result(responseObj,key_word):
             print("key_word_list: %s" % key_word_list)
             # 断言结果标识符
             flag = True
+            exception_info = ''
             # 遍历分隔出来的断言关键词列表
             for keyWord in key_word_list:
                 if '"'in keyWord:
@@ -121,24 +122,25 @@ def assert_result(responseObj,key_word):
                     if not (keyWord in str(responseObj.json())):
                         print("断言失败，关键词为： %s" % keyWord)
                         flag = False
+                        exception_info = "keyword: {} not matched from response, assert failed".format(keyWord)
                     else:
                         print("断言词匹配成功：'{}'".format(keyWord))
             print("flag: %s" % flag)
             if flag:
                 print("断言成功")
-            return flag
+            return flag, exception_info
 
         else:
             print("key_word: %s" % key_word)
             if key_word in str(responseObj.json()):
                 print("断言成功")
-                return True
+                return True, ''
             else:
                 print("断言失败，断言词为: %s" % key_word)
-                return False
+                return False, ''
     except Exception as e:
         print("error occurs in assert_result function: %s" % e)
-        return False
+        return False, traceback.format_exc()
 
 
 
