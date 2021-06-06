@@ -140,7 +140,8 @@ import pymysql         # 一定要添加这三行！
 pymysql.version_info = (1, 3, 13, "final", 0)   #此行在启动出错后有需要在写
 pymysql.install_as_MySQLdb()
 
+redis_port = 6379
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # Broker配置，使用Redis作为消息中间件
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1' # BACKEND配置，这里使用redis
+CELERY_BROKER_URL = 'redis://127.0.0.1:{}/0'.format(redis_port) # Broker配置，使用Redis作为消息中间件
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:{}/1'.format(redis_port) # BACKEND配置，这里使用redis
 CELERY_RESULT_SERIALIZER = 'json' # 结果序列化方案

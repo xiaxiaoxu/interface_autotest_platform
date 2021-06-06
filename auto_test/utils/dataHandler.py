@@ -5,8 +5,8 @@ import hashlib
 import os
 import json
 import traceback
-from .api_request import api_request
-
+import redis
+from interface_auto_test_platform.settings import redis_port
 
 #初始化框架工程中的全局变量，存储在测试数据中的唯一值数据
 #框架工程中若要使用字典中的任意一个变量，则每次使用后，均需要将字典中的value值进行加1操作。
@@ -15,25 +15,20 @@ from .api_request import api_request
 proj_path = os.path.dirname(os.path.dirname(__file__))
 data_file = os.path.join(proj_path,"config\\staticDataFile")
 
+pool = redis.ConnectionPool(host='localhost', port=redis_port, decode_responses=True)
+r = redis.Redis(connection_pool=pool)
 
 def get_unique_number_value(unique_number):
     data = None
     try:
-        with open(data_file,"rb") as fp:
-            var = pickle.load(fp) # 读取pickle序列化字节流文件中内容，反序列化成python的字典对象：{"unique_num1":100,"unique_num2":1000}
-            print("字节流文件内容: %s" % var)
-            data= var[unique_number] # 获取字典对象中key为unique_number的值
+        redis_value = r.get(unique_number) # {"unique_number": 666}
+        if redis_value:
+            data = redis_value
             print("全局唯一数当前生成的值是：%s" %data)
-            # global_vars = json.loads(os.environ['global_vars'])
-            # print("global_vars: {}".format(global_vars))
-            # global_vars[unique_number]=data
-            # os.environ['global_vars'] = json.dumps(global_vars)
-            # print("os.environ['global_vars']: {}".format(os.environ['global_vars']))
-            var[unique_number] +=1 # 把字典对象中key为unique_number的值进行加一操作，以便下提取时保持唯一
-        with open(data_file,"wb") as fp:
-            pickle.dump(var,fp) # 修改后的字典对象，序列化到字节流文件中
+            # 把redis中key为unique_number的值进行加一操作，以便下提取时保持唯一
+            r.set(unique_number, int(redis_value) + 1)
     except Exception as e:
-        print("获取测试框架的全局唯一数变量值失败，请求的全局唯一数变量是%s,异常原因如下：%s" %(unique_number,e))
+        print("获取全局唯一数变量值失败，请求的全局唯一数变量是%s,异常原因如下：%s" %(unique_number, traceback.format_exc()))
         data = None
     finally:
         return data
@@ -160,4 +155,4 @@ if __name__ =="__main__":
     # logger.info('data["unique_num2"]: ', data["unique_num2"])
 
     print(get_unique_number_value("unique_num1"))
-    print(get_unique_number_value("unique_num2"))
+    # print(get_unique_number_value("unique_num2"))
