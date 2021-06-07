@@ -16,11 +16,12 @@
                   <th width="4%">名称</th>
                   <th width="20%">请求数据</th>
                   <th width="20%">执行返回结果</th>
+                  <th width="5%">操作</th>
                   <th>断言内容</th>
                   <th width="5%">执行结果</th>
                   <th width="5%">异常信息</th>
                   <th width="10%">请求后提取变量</th>
-                  <th width="8%">开始时间</th>
+<!--                  <th width="8%">开始时间</th>-->
                   <th width="8%">执行耗时(ms)</th>
                 </tr>
                 </thead>
@@ -32,6 +33,7 @@
 		<td><a href="{% url 'testCaseDetail' testrecord.belong_test_case.id%}" target="_blank">{{ testrecord.belong_test_case.case_name }}</a></td>
         <td>{{ testrecord.request_data }}</td>
         <td>{{ testrecord.response_data }}</td>
+        <td><a href="{% url 'diffResponse' testrecord.id%}" target="_blank">对比差异</a></td></td>
         <td>{{ testrecord.belong_test_case.assert_key }}</td>
 		<td>{{ testrecord.execute_result|default_if_none:"" }}</td>
         {% if testrecord.exception_info %}
@@ -41,7 +43,7 @@
         {% endif %}
 
 		<td>{{ testrecord.belong_test_case.extract_var }}</td>
-		<td>{{ testrecord.execute_start_time }}</td>
+<!--		<td>{{ testrecord.execute_start_time }}</td>-->
 		<td>{{ testrecord.execute_total_time }}</td>
                 </tr>
 	{% endfor %}

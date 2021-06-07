@@ -20,11 +20,21 @@ def interface_test_task(test_case_id_list, server_address):
     for test_case_id in test_case_id_list:
         test_case = models.TestCase.objects.filter(id=int(test_case_id))[0]
         print("######执行用例: {}".format(test_case))
+        last_execute_record_data = models.TestCaseExecuteRecord.objects.filter(
+            belong_test_case_id=test_case_id).order_by('-id')
+        if last_execute_record_data:
+            last_time_execute_response_data = last_execute_record_data[0].response_data
+        else:
+            last_time_execute_response_data = ''
+        print("last_execute_record_data: {}".format(last_execute_record_data))
+        print("last_time_execute_response_data: {}".format(last_time_execute_response_data))
         execute_record = models.TestCaseExecuteRecord.objects.create(belong_test_case=test_case)
         execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
         print("execute_start_time: {}".format(execute_start_time))
         execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_start_time))
         print("execute_record.execute_start_time: {}".format(execute_record.execute_start_time))
+        execute_record.last_time_response_data = last_time_execute_response_data
+        # 获取当前用例上一次执行结果
         execute_record.save()
         '''
         interface_name = models.CharField('接口名称', max_length=50, null=False)  # register
@@ -128,12 +138,21 @@ def web_suit_task(test_suit_record, test_suit):
     for test_suit_test_case in test_suit_test_cases:
         test_case = test_suit_test_case.test_case
         print("######执行用例: {}".format(test_case))
+        last_execute_record_data = models.TestSuitTestCaseExecuteRecord.objects.filter(
+            test_case_id=test_case.id).order_by('-id')
+        if last_execute_record_data:
+            last_time_execute_response_data = last_execute_record_data[0].response_data
+        else:
+            last_time_execute_response_data = ''
+        print("last_execute_record_data: {}".format(last_execute_record_data))
+        print("last_time_execute_response_data: {}".format(last_time_execute_response_data))
         suite_case_execute_record = models.TestSuitTestCaseExecuteRecord.objects.create(test_suit_record=test_suit_record,
                                                                              test_case=test_case)
         execute_start_time = time.time()  # 记录时间戳，便于计算总耗时（毫秒）
         print("execute_start_time: {}".format(execute_start_time))
         suite_case_execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(execute_start_time))
         print("suite_case_execute_record.execute_start_time: {}".format(suite_case_execute_record.execute_start_time))
+        suite_case_execute_record.last_time_response_data = last_time_execute_response_data
         suite_case_execute_record.save()
         request_data = test_case.request_data
         extract_var = test_case.extract_var

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
 from . import models
 import traceback
+import json
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -233,6 +234,24 @@ def testrecord(request):
     testrecords = models.TestCaseExecuteRecord.objects.filter().order_by('-id')
     return render(request, 'auto_test/testrecord.html', {'testrecords': get_paginator(request, testrecords)})
 
+@login_required
+def diffResponse(request, test_record_id):
+    test_record_data = models.TestCaseExecuteRecord.objects.get(id=test_record_id)
+    print("test_record_data: {}".format(test_record_data))
+    present_response = test_record_data.response_data
+    if present_response and "'" in present_response:
+        present_response = present_response.replace("'", '"')
+        print("present_response after replace "''": {}".format(present_response))
+        present_response = json.dumps(json.loads(present_response),sort_keys=True, indent=4)
+        print("present_response after json.dumps: {}".format(present_response))
+    last_time_execute_response = test_record_data.last_time_response_data
+    if last_time_execute_response and "'" in last_time_execute_response:
+        last_time_execute_response = last_time_execute_response.replace("'", '"')
+        print("last_time_execute_response after replace "''": {}".format(last_time_execute_response))
+        last_time_execute_response = json.dumps(json.loads(last_time_execute_response), sort_keys=True, indent=4)
+        print("last_time_execute_response after json.dumps "''": {}".format(last_time_execute_response))
+    print("last_time_execute_response: {}".format(last_time_execute_response))
+    return render(request, 'auto_test/diffResponse.html', locals())
 
 @login_required
 def show_test_suit_record(request):

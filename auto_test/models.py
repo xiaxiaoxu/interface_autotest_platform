@@ -96,6 +96,7 @@ class TestCaseExecuteRecord(models.Model):
     request_data = models.CharField('请求体', max_length=1024, null=True)  # {"code": "00", "userid": 22889}
     response_data = models.CharField('响应字符串', max_length=1024, null=True)  # {"code": "00", "userid": 22889}
     execute_result = models.CharField('执行结果', max_length=1024, null=True)  # 成功/失败
+    last_time_response_data =  models.CharField('上一次响应字符串', max_length=1024, null=True)  # {"code": "00", "userid": 22889}
     execute_total_time = models.CharField('执行耗时', max_length=1024, null=True)  # 35秒
     execute_start_time = models.CharField('执行开始时间', max_length=300, blank=True, null=True)
     execute_end_time = models.CharField('执行结束时间', max_length=300, blank=True, null=True)
@@ -103,7 +104,7 @@ class TestCaseExecuteRecord(models.Model):
     updated_time = models.DateTimeField('更新时间', auto_now=True, null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         verbose_name = '用例执行结果记录表'
@@ -185,6 +186,8 @@ class TestSuitTestCaseExecuteRecord(models.Model):
     request_data = models.CharField('请求体', max_length=1024, null=True)  # {"code": "00", "userid": 22889}
     response_data = models.CharField('响应字符串', max_length=1024, null=True)  # {"code": "00", "userid": 22889}
     execute_result = models.CharField('执行结果', max_length=1024, null=True)  # 成功/失败
+    last_time_response_data = models.CharField('上一次响应字符串', max_length=1024,
+                                               null=True)  # {"code": "00", "userid": 22889}
     execute_total_time = models.CharField('执行耗时', max_length=1024, null=True)  # 35秒
     execute_start_time = models.CharField('执行开始时间', max_length=300, blank=True, null=True)
     execute_end_time = models.CharField('执行结束时间', max_length=300, blank=True, null=True)
