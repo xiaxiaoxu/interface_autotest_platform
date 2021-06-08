@@ -235,20 +235,40 @@ def testrecord(request):
     return render(request, 'auto_test/testrecord.html', {'testrecords': get_paginator(request, testrecords)})
 
 @login_required
-def diffResponse(request, test_record_id):
+def diffCaseResponse(request, test_record_id):
     test_record_data = models.TestCaseExecuteRecord.objects.get(id=test_record_id)
     print("test_record_data: {}".format(test_record_data))
     present_response = test_record_data.response_data
     if present_response and "'" in present_response:
         present_response = present_response.replace("'", '"')
         print("present_response after replace "''": {}".format(present_response))
-        present_response = json.dumps(json.loads(present_response),sort_keys=True, indent=4)
+        present_response = json.dumps(json.loads(present_response),sort_keys=True, indent=4, ensure_ascii=False) # 中文字符不转ascii编码
+        print("present_response: {}".format(present_response))
+    last_time_execute_response = test_record_data.last_time_response_data
+    if last_time_execute_response and "'" in last_time_execute_response:
+        last_time_execute_response = last_time_execute_response.replace("'", '"')
+        print("last_time_execute_response after replace "''": {}".format(last_time_execute_response))
+        last_time_execute_response = json.dumps(json.loads(last_time_execute_response), sort_keys=True, indent=4, ensure_ascii=False)
+        print("last_time_execute_response after json.dumps "''": {}".format(last_time_execute_response))
+    print("last_time_execute_response: {}".format(last_time_execute_response))
+    return render(request, 'auto_test/diffResponse.html', locals())
+
+@login_required
+def diffSuiteCaseResponse(request, suite_case_record_id):
+    test_record_data = models.TestSuitTestCaseExecuteRecord.objects.get(id=suite_case_record_id)
+    print("test_record_data: {}".format(test_record_data))
+    present_response = test_record_data.response_data
+    if present_response and "'" in present_response:
+        present_response = present_response.replace("'", '"')
+        print("present_response after replace "''": {}".format(present_response))
+        print("json.loads(present_response): {}".format(json.loads(present_response)))
+        present_response = json.dumps(json.loads(present_response),sort_keys=True, indent=4, ensure_ascii=False)
         print("present_response after json.dumps: {}".format(present_response))
     last_time_execute_response = test_record_data.last_time_response_data
     if last_time_execute_response and "'" in last_time_execute_response:
         last_time_execute_response = last_time_execute_response.replace("'", '"')
         print("last_time_execute_response after replace "''": {}".format(last_time_execute_response))
-        last_time_execute_response = json.dumps(json.loads(last_time_execute_response), sort_keys=True, indent=4)
+        last_time_execute_response = json.dumps(json.loads(last_time_execute_response), sort_keys=True, indent=4, ensure_ascii=False)
         print("last_time_execute_response after json.dumps "''": {}".format(last_time_execute_response))
     print("last_time_execute_response: {}".format(last_time_execute_response))
     return render(request, 'auto_test/diffResponse.html', locals())

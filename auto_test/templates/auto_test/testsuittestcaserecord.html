@@ -18,6 +18,7 @@
                   <th width="5%">状态</th>
                   <th width="20%">请求数据</th>
                   <th width="20%">执行返回结果</th>
+                  <th width="5%">操作</th>
                   <th width="10%">断言内容</th>
                   <th width="5%">执行结果</th>
                   <th width="5%">异常信息</th>
@@ -45,6 +46,7 @@
                 {% endif %}
                 <td>{{ test_case_record.request_data }}</td>
                 <td>{{ test_case_record.response_data }}</td>
+                <td><a href="{% url 'diffSuiteCaseResponse' test_case_record.id%}" target="_blank">对比差异</a></td>
                 <td>{{ test_case_record.test_case.assert_key }}</td>
                 <td>{{ test_case_record.execute_result|default_if_none:"" }}</td>
                 <td>{{ test_case_record.exception_info|default_if_none:"" }}</td>

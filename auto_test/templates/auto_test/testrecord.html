@@ -2,12 +2,6 @@
 {% block title %}主页{% endblock %}
 
 {% block content %}
-<!--    {% if request.session.is_login %}-->
-<!--    <h1>你好,{{ request.session.user_name }}！欢迎回来！</h1>-->
-<!--    {% endif %}-->
-<!--    <br>-->
-
-
     <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -33,7 +27,7 @@
 		<td><a href="{% url 'testCaseDetail' testrecord.belong_test_case.id%}" target="_blank">{{ testrecord.belong_test_case.case_name }}</a></td>
         <td>{{ testrecord.request_data }}</td>
         <td>{{ testrecord.response_data }}</td>
-        <td><a href="{% url 'diffResponse' testrecord.id%}" target="_blank">对比差异</a></td></td>
+        <td><a href="{% url 'diffCaseResponse' testrecord.id %}" target="_blank">对比差异</a></td>
         <td>{{ testrecord.belong_test_case.assert_key }}</td>
 		<td>{{ testrecord.execute_result|default_if_none:"" }}</td>
         {% if testrecord.exception_info %}
@@ -51,7 +45,6 @@
              
              </tbody>
             </table>
-    </div>
 
     {# 实现分页标签的代码 #}
     {# 这里使用 bootstrap 渲染页面 #}

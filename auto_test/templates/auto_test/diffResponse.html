@@ -1,13 +1,7 @@
 ﻿{% extends 'auto_test/base.html' %}
-{% block title %}主页{% endblock %}
-{% load myfilter %}
+{% block title %}主页{% endblock %}时
+
 {% block content %}
-<!--    {% if request.session.is_login %}-->
-<!--    <h1>你好,{{ request.session.user_name }}！欢迎回来！</h1>-->
-<!--    {% endif %}-->
-<!--    <br>-->
-
-
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -15,29 +9,18 @@
                   <th width="50%">本次执行结果</th>
                 </tr>
                 </thead>
-                <tbody style="overflow-y: hidden">
+                <tbody>
                     <tr>
-                        <td style="height: 30px;"><pre>{{ last_time_execute_response | safe }}</pre></td>
-                        <td style="height: 100px;"><pre>{{ present_response | safe }}</pre></td>
+                        <td>
+                            <div>
+                                <pre style="height: 400px;">{{ last_time_execute_response | safe }}</pre>
+                            </div>
+                        </td>
+                        <td>
+                            <div><pre style="height: 400px;">{{ present_response | safe }}</pre></div>
+                        </td>
                      </tr>
                 </tbody>
             </table>
 
-    {# 实现分页标签的代码 #}
-    {# 这里使用 bootstrap 渲染页面 #}
-    <div id="pages" class="text-center" >
-        <nav>
-            <ul class="pagination">
-                <li class="step-links">
-                {% if testrecords.has_previous %}
-                    <a class='active' href="?page={{ testrecords.previous_page_number }}">上一页</a>
-                {% endif %}
-
-                <span class="current">
-                    第 {{ testrecords.number }} 页/共 {{ testrecords.paginator.num_pages }} 页</span>
-
-                {% if testrecords.has_next %}
-                    <a class='active' href="?page={{ testrecords.next_page_number }}">下一页</a>
-                {% endif %}
-                </li></ul></nav></div>
 {% endblock %}
