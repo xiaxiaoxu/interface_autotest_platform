@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .forms import UserForm
 from . import tasks
+from .models import  Project
 
 
 # Create your views here.
@@ -74,7 +75,7 @@ def login(request):
 @login_required
 def project(request):
     print("login success!", request.user.is_authenticated)
-    projects = models.Project.objects.filter().order_by('-id')
+    projects = Project.objects.filter().order_by('-id')
     print("projects:", projects)
     return render(request, 'auto_test/project.html', {'projects': get_paginator(request, projects)})
 
@@ -332,8 +333,8 @@ def managesuit(request, suit_id):
         if testcases_list:
             print("------********", testcases_list)
             for testcase in testcases_list:
-                test_case = models.TestCase.objects.get(id=int(testcase));
-                suitcase = models.TestSuitTestCases.objects.create(test_suit=test_suit, test_case=test_case)
+                test_case = models.TestCase.objects.get(id=int(testcase))
+                models.TestSuitTestCases.objects.create(test_suit=test_suit, test_case=test_case)
         else:
             print("添加测试用例失败")
             return HttpResponse("添加的运行测试用例为空，请选择用例后再添加！")
