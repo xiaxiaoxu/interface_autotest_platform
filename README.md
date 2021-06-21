@@ -1,1 +1,2 @@
 # interface_autotest_platform
+基于django开发的接口自动化测试平台
